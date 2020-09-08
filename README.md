@@ -6,4 +6,4 @@ To use the bot, use `q.f QUOTE`
 
 The following is an example on how the bot works in realtime-
 
-![](Quote-Finder/Images/bot_output.gif)
+![](https://github.com/Roguedev1/Quote-Finder/blob/main/Images/bot_output.gif)
