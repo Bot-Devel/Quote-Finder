@@ -31,12 +31,13 @@ async def f(ctx,*,arg):
         return  #None 
     msg=list(arg.upper())
     channel=['752193632383008770','752196383066554538']
-    whitelist=['A','B','C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W','X', 'Y', 'Z',0,1,2,3,4,5,6,7,8,9,'!','?',' ','.',';',',','"',"'",'…']
+    whitelist=['A','B','C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W','X', 'Y', 'Z',0,1,2,3,4,5,6,7,8,9,'!','?',' ','.',';',',','"',"'",'…','*','-']
     if str(ctx.channel.id) in channel:
         # if msg in whitelist:
         if all(elem in whitelist for elem in msg):
             def qt(arg1):
-                file1 = "/app/Harry Potter and the Prince of Slytherin.txt"
+                file1 = "/app/Harry Potter and the Prince of Slytherin_md.txt"
+                # file1 = "/app/Harry Potter and the Prince of Slytherin_pt.txt"
                 bo,lin=search_string(file1, arg1)
                 a = [x - 1 for x in lin]
                 res= []
