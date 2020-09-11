@@ -15,7 +15,7 @@ def search_string(book1,book2,string_to_search):
     index= []
     ar1=[r'\W']
     ar1.append(string_to_search.lower())
-    ar1.append(r'\W')
+    ar1.append(r"\W")
     ar2 =''.join(map(str, ar1)) 
     ar2.join(ar1)
     raw=r"{}".format(ar2)
@@ -65,7 +65,7 @@ async def f(ctx,*,arg):
                     return 'err','err',k
                 for i in range(next1,0,-1):
                     if t in bo[i]:
-                        chap.append(bo[i]) #appends the chapter name to the list
+                        chap.append(bo[i])
                 next1+=2
                 next1= bo[next1]
                 str1 = ""    
@@ -80,12 +80,14 @@ async def f(ctx,*,arg):
         def chapter(chap1):
             c=list(chap1)
             ct=0
-            # m='&'
+            ct1=0
+            co=0
+            chno=[]
             p1=[]
             for i in range(0,len(c)):
                 ct+=1
                 if '&' == c[i]:
-                    p1.append(ct) #found &
+                    p1.append(ct)
             p=p1[0]
             p+=3
             chap1=['C','h','a','p','t','e','r',' ']
@@ -97,12 +99,22 @@ async def f(ctx,*,arg):
                 book.append(c[i])
             book.append(" | ")
             tit=book+chap1
-            return tit
+            for i in range(0,len(c)):
+                ct1+=1
+                if '.' == c[i]:
+                    co=ct1
+            for i in range(0,co-1):
+                chno.append(c[i])
+            chno=''.join(chno) 
+            chno=filter(str.isdigit, chno) 
+            chno=''.join(chno)
+            url="\nRead the chapter here- https://www.fanfiction.net/s/11191235/"+chno+"/Harry-Potter-and-the-Prince-of-Slytherin"
+            return tit,url
         des,chap,k=qt(arg)
         if k==1:
-            tit=chapter(chap)
+            tit,url=chapter(chap)
             embed1=discord.Embed(title=''.join(tit),
-                description=des,
+                description=des+url,
                 colour=discord.Colour(0x272b28))
         embed2=discord.Embed(
             description="Quote not found!",
@@ -110,14 +122,13 @@ async def f(ctx,*,arg):
         if k==1:
             await ctx.send(embed=embed1) 
         else:
-            await ctx.send(embed=embed2)  
-            # await ctx.send(qt(arg)) #output without embed                
+            await ctx.send(embed=embed2)                 
 
 @client.command(pass_context=True)
 async def fhelp(ctx):
     if ctx.message.author == client.user:
         return  #None 
-    des="To use the bot, use the command- `q.f QUOTE`"+'\n'+"For example- `q.f Voldemort is back`"+'\n\n'+"Github Repo- https://github.com/Roguedev1/Quote-Finder"+'\n'+"Contact the developer for any queries- @RogueOne"
+    des="To use the bot, use the command- `q.f QUOTE`"+'\n'+"**Replace the single quotation `'` with double quotation symbol in the following paragraphs, i m using the single quotation just to illustrate because double quotation is used to start and end a string in Python.**"+'\n'+"Note- Do not use any quote ending with `.`or `'` or `.'` or `!'` **if** the line from the POS fanfic itself ends with `!'` or `.'` since the code that i am using wont be able to search a quote ending with `.` unless an alphanumeric or non-alphanumeric character immediately follows that dot. It might be fixed in the future."+'\n'+"Ref- https://stackoverflow.com/questions/18004955/regex-using-word-boundary-but-word-ends-with-a-period"+'\n\n'+"For example-"+'\n'+"In the line from the fanfic- `'Our Jim did it?' said James in wonder. 'It's ... a miracle!'`"+'\n'+"The following command wont work-"+'\n'+"`q.f James in wonder.`"+'\n'+"But `q.f James in wonder. '` will work."+'\n\n'+"The following command wont work-"+'\n'+"`q.f It's ... a miracle!'` and `q.f It's ... a miracle!"+'\n'+"`But `q.f It's ... a miracle` will work."+'\n\n'+"**TL;DR: Its safer to not use `.`, `!`, `'` at the end of the quote unless you know there is a word after it."+'\n'+"For eg- `q.f It's ... a miracle`**"+'\n\n'+"Github Repo- https://github.com/Roguedev1/Quote-Finder"+'\n'+"Contact the developer for any queries- @RogueOne"
     embed1=discord.Embed(title='Quick Doc',
                 description=des,
                 colour=discord.Colour(0x272b28))
