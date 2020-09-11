@@ -108,7 +108,7 @@ async def f(ctx,*,arg):
             chno=''.join(chno) 
             chno=filter(str.isdigit, chno) 
             chno=''.join(chno)
-            url="\nRead the chapter here- https://www.fanfiction.net/s/11191235/"+chno+"/Harry-Potter-and-the-Prince-of-Slytherin"
+            url="\nhttps://www.fanfiction.net/s/11191235/"+chno+"/Harry-Potter-and-the-Prince-of-Slytherin"
             return tit,url
         des,chap,k=qt(arg)
         if k==1:
