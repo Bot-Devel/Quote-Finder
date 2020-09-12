@@ -112,9 +112,10 @@ async def f(ctx,*,arg):
             return tit,url
         des,chap,k=qt(arg)
         if k==1:
-            tit,url=chapter(chap)
+            tit,url1=chapter(chap)
             embed1=discord.Embed(title=''.join(tit),
-                description=des+url,
+                url=url1,
+                description=des,
                 colour=discord.Colour(0x272b28))
         embed2=discord.Embed(
             description="Quote not found!",
