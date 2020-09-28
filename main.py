@@ -76,6 +76,7 @@ async def f(ctx,*,arg):
                     str1+=next1
                 if len(chap) == 0:
                     chap.append("0. HP&POS 0: First Page") #dummy book+chap name
+                str1='%.2047s' % str1
                 return str1,chap[0],k
         def chapter(chap1):
             c=list(chap1)
