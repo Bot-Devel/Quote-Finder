@@ -13,7 +13,7 @@ def search_string(book1,book2,string_to_search):
     line_number = 0
     mylines = [] 
     index= []
-    ar1=[r'\W']
+    ar1=[r'\b']
     ar1.append(string_to_search.lower())
     ar1.append(r"\W")
     ar2 =''.join(map(str, ar1)) 
