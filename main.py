@@ -34,7 +34,6 @@ def search_string(book1,book2,string_to_search):
             line_number += 1
             mylines.append(line) 
     # Return list of all the lines and line number where string is found
-    print(index)
     return mylines,index
 
 @client.command(pass_context=True)
@@ -45,27 +44,28 @@ async def f(ctx,*,arg):
     channel=['752193632383008770','752196383066554538']
     whitelist=['A','B','C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W','X', 'Y', 'Z',0,1,2,3,4,5,6,7,8,9,'!','?',' ','.',';',',','"',"'",'…','*','-',':']
     if str(ctx.channel.id) in channel:
-        # if msg in whitelist:
+        # if msg in whitelist
         k=0
         if all(elem in whitelist for elem in msg):
             def qt(arg1):
-                file1 = "/home/arbaaz/Personal/Git/Repos/Quote-Finder/Harry Potter and the Prince of Slytherin_pt.txt"
-                file2 = "/home/arbaaz/Personal/Git/Repos/Quote-Finder/Harry Potter and the Prince of Slytherin_md.txt"
-                # file1 = "/app/Harry Potter and the Prince of Slytherin_pt.txt"
-                # file2 = "/app/Harry Potter and the Prince of Slytherin_md.txt"
-                bo,lin=search_string(file1,file2,arg1)
+                file1 = "/app/Harry Potter and the Prince of Slytherin_pt.txt"
+                file2 = "/app/Harry Potter and the Prince of Slytherin_md.txt"
+                bo,lin=search_string(file1,file2,arg1) #bo=list of all the lines and line number where string is found
                 a = [x - 1 for x in lin]
                 res= []
                 chap= []
-                t=". HP&"
                 try:
                     for i in range(1):
                         res.append(bo[a[i]].rstrip())
-                        next1=a[i]
+                        next1=a[i] #index of the quote location
                         k=1
                 except IndexError:
                     k=0
                     return 'err','err',k
+                if next1<51316: # after 51316, ". HB&" starts
+                    t=". HP&" #till chapter 138
+                else:
+                    t=". HB&" #from chapter 139
                 for i in range(next1,0,-1):
                     if t in bo[i]:
                         chap.append(bo[i])
@@ -82,17 +82,14 @@ async def f(ctx,*,arg):
                 str1='%.2047s' % str1
                 return str1,chap[0],k
         def chapter(chap1):
-            c=list(chap1)
+            c=list(chap1) #string containing . HP& or . HB&
             ct=0
             ct1=0
-            co=0
             chno=[]
-            p1=[]
             for i in range(0,len(c)):
                 ct+=1
                 if '&' == c[i]:
-                    p1.append(ct)
-            p=p1[0]
+                    p=ct # location of &
             p+=3
             chap1=['C','h','a','p','t','e','r',' ']
             book=[]
