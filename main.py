@@ -34,6 +34,7 @@ def search_string(book1,book2,string_to_search):
             line_number += 1
             mylines.append(line) 
     # Return list of all the lines and line number where string is found
+    print(index)
     return mylines,index
 
 @client.command(pass_context=True)
@@ -48,8 +49,10 @@ async def f(ctx,*,arg):
         k=0
         if all(elem in whitelist for elem in msg):
             def qt(arg1):
-                file1 = "/app/Harry Potter and the Prince of Slytherin_pt.txt"
-                file2 = "/app/Harry Potter and the Prince of Slytherin_md.txt"
+                file1 = "/home/arbaaz/Personal/Git/Repos/Quote-Finder/Harry Potter and the Prince of Slytherin_pt.txt"
+                file2 = "/home/arbaaz/Personal/Git/Repos/Quote-Finder/Harry Potter and the Prince of Slytherin_md.txt"
+                # file1 = "/app/Harry Potter and the Prince of Slytherin_pt.txt"
+                # file2 = "/app/Harry Potter and the Prince of Slytherin_md.txt"
                 bo,lin=search_string(file1,file2,arg1)
                 a = [x - 1 for x in lin]
                 res= []
