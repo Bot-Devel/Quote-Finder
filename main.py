@@ -3,7 +3,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 from utils import embed_page
-client = commands.Bot(command_prefix='q.')
+client = commands.Bot(command_prefix=['q.', 'Q.'])
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -15,7 +15,7 @@ async def f(ctx, *, arg):
     msg = list(arg.upper())
     channel = ['752196383066554538', '752193632383008770']
     whitelist = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                 'V', 'W', 'X', 'Y', 'Z', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
+                 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
     if str(ctx.channel.id) in channel:
         if all(elem in whitelist for elem in msg):  # if msg in whitelist
             embed_pg, page_limit = embed_page(arg)
@@ -58,7 +58,7 @@ async def f(ctx, *, arg):
             await message.clear_reactions()
 
 
-@ client.command(pass_context=True)
+@client.command(pass_context=True)
 async def fhelp(ctx):
     if ctx.message.author == client.user:
         return  # None
