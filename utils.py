@@ -1,8 +1,9 @@
 import re
+import discord
 
 
 def search_string(book1, book2, string_to_search):
-    """Search for the given string in the file and return all the lines of the 
+    """Search for the given string in the file and return all the lines of the
     book as a list and list of all the line numbers containing the string"""
     line_number = 0
     mylines = []  # contains all the lines of the book as a list
@@ -21,36 +22,47 @@ def search_string(book1, book2, string_to_search):
             if re.search(raw, line.lower()) is not None:
                 # if string found, append the line number
                 index.append(line_number)
+    if len(index) == 0:  # =if string was found, index list wont be empty
+        quote_found_ctr = 0  # quote found counter to know if the quote was found during the query
+    else:
+        quote_found_ctr = 1
     with open(book2, 'r') as read_obj1:
         # Read all lines in the file one by one
         for line in read_obj1:
             # Append each line of the book to the mylines list
             line_number += 1
             mylines.append(line)
-    return mylines, index
+    return mylines, index, quote_found_ctr
 
 
-def quote_find(arg1):
+def quote_find(arg1, page_number):
     """Find the quote and return both the line containing the quote as well as
-     the next line, chapter heading of the chapter where the quote was found 
+     the next line, chapter heading of the chapter where the quote was found
      and quote found counter """
     file1 = "Text Files/Harry Potter and the Prince of Slytherin_pt.txt"
     file2 = "Text Files/Harry Potter and the Prince of Slytherin_md.txt"
     # book_lines=list of all the lines of the book and line_number=line number where string is found
-    book_lines, line_number1 = search_string(file1, file2, arg1)
+    book_lines, line_number1, quote_found_ctr = search_string(
+        file1, file2, arg1)
     # Subtracting 1 from the line_number list because of mismatch of line number when all the lines were assigned to list book_lines
     line_number2 = [x - 1 for x in line_number1]
     result = []  # list contains the line where the quote was found and the next line
     chapter_heading = []  # line containg the chapter heading
     try:
+        if quote_found_ctr == 0:  # if no string found in the file
+            return 'err', 'err', quote_found_ctr, len(line_number2)
         for i in range(1):
-            result.append(book_lines[line_number2[i]].rstrip())
+            result.append(book_lines[line_number2[page_number]].rstrip())
             # line at which the quote was found
-            quote_found = line_number2[i]
+            if len(line_number2) > page_number:
+                quote_found = line_number2[page_number]
+            else:
+                quote_found = line_number2[len(line_number2)]
             quote_found_ctr = 1
+
     except IndexError:
-        quote_found_ctr = 0
-        return 'err', 'err', quote_found_ctr
+        quote_found_ctr = 2  # if the page number croses the len(line_number2)
+        return 'err', 'err', quote_found_ctr, len(line_number2)
     if quote_found < 51316:  # after line number 51316, ". HB&" starts
         pos_book_tag = ". HP&"  # till chapter 138
     else:  # pos_book_tag is the identifier used to recognize the book name i.e. HP or HB
@@ -72,7 +84,7 @@ def quote_find(arg1):
         chapter_heading.append("0. HP&POS 0: First Page")
     str1 = '%.2047s' % str1
     # chapter_heading[0] contains the chapter heading of the chapter where the quote was found
-    return str1, chapter_heading[0], quote_found_ctr
+    return str1, chapter_heading[0], quote_found_ctr, len(line_number2)
 
 
 def chapter_processing(chap1):
@@ -110,3 +122,29 @@ def chapter_processing(chap1):
     url = "\nhttps://www.fanfiction.net/s/11191235/" + \
         chapter_number+"/Harry-Potter-and-the-Prince-of-Slytherin"
     return chapter_title, url
+
+
+def embed_page(arg, page=0):
+    chapter_desription, chapter_heading, quote_found_ctr, page_limit = quote_find(
+        arg, page)
+    if quote_found_ctr == 1:  # to fix the  UnboundLocalError: local variable 'loc_of_and' referenced before assignment error
+        chapter_title, chapter_url = chapter_processing(
+            chapter_heading)
+    chapter_desription = chapter_desription + \
+        "\n"+"Page: "+str(page+1)+'/'+str(page_limit)
+    if quote_found_ctr == 1:
+        embed1 = discord.Embed(title=''.join(chapter_title),
+                               url=chapter_url,
+                               description=chapter_desription,
+                               colour=discord.Colour(0x272b28))
+        return embed1, page_limit
+    elif quote_found_ctr == 0:
+        embed1 = discord.Embed(
+            description="Quote not found!",
+            colour=discord.Colour(0x272b28))
+        return embed1, page_limit
+    elif quote_found_ctr == 2:
+        embed1 = discord.Embed(
+            description="No more quotes found. Please go back to the previous page",
+            colour=discord.Colour(0x272b28))
+        return embed1, page_limit
