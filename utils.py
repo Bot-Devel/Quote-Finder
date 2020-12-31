@@ -82,7 +82,9 @@ def quote_find(arg1, page_number):
     if len(chapter_heading) == 0:
         # dummy book+chap name
         chapter_heading.append("0. HP&POS 0: First Page")
-    str1 = '%.2047s' % str1
+    # To fix the embed.description: Must be 2048 or fewer in length error
+    if len(list(str1)) > 2048:
+        str1 = str1[:2020] + "..."
     # chapter_heading[0] contains the chapter heading of the chapter where the quote was found
     return str1, chapter_heading[0], quote_found_ctr, len(line_number2)
 
@@ -145,6 +147,6 @@ def embed_page(arg, page=0):
         return embed1, page_limit
     elif quote_found_ctr == 2:
         embed1 = discord.Embed(
-            description="No more quotes found. Please go back to the previous page",
+            description="No more quotes found!",
             colour=discord.Colour(0x272b28))
         return embed1, page_limit
