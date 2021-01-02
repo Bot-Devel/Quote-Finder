@@ -2,24 +2,71 @@ import re
 import discord
 
 
+def get_raw_string(string_to_search):
+    """Process the given string and return the regex as a raw string"""
+    string_processing = []
+    first_word = []
+    rest_of_the_word = []
+    for i in range(0, len(string_to_search)):
+        if " " in string_to_search[i]:
+            # locate the whitespace in the list containing the string
+            loc_of_space = i
+            break
+        else:
+            loc_of_space = None
+    if loc_of_space is not None:  # if whitespace is there, that means there are more than two words. Seperate the string into two parts
+        for i in range(0, loc_of_space):
+            first_word.append(string_to_search[i])
+        for i in range(loc_of_space, len(string_to_search)):
+            rest_of_the_word.append(string_to_search[i])
+        first_word = ''.join(map(str, first_word))
+        rest_of_the_word = ''.join(map(str, rest_of_the_word))
+    else:  # if whitespace is not there, its a single word so no seperation of word needed
+        first_word = ''.join(map(str, string_to_search))
+    # If the string starts with ", a different regex is needed.
+    # string[1] is being used in if statement because 1st element is a /
+    if string_to_search[1] == "\"":
+        if loc_of_space is not None:
+            string_processing = [r'^[']
+            string_processing.append(first_word.lower())
+            string_processing.append(r']+.')
+            string_processing.append(rest_of_the_word.lower())
+            # converting the list to string
+            raw = ''.join(map(str, string_processing))
+            return raw
+        else:  # if its a single word string
+            string_processing = ['']
+            string_processing.append(first_word.lower())
+            raw = ''.join(map(str, string_processing))
+            return raw
+    else:
+        # converting the list to string
+        string_to_search = ''.join(map(str, string_to_search))
+        string_processing = [r'\b']
+        string_processing.append(string_to_search.lower())
+        # Using \b since i dont want it to include . after a word
+        string_processing.append(r"\b")
+        raw = ''.join(map(str, string_processing))
+        return raw
+
+
 def search_string(book1, book2, string_to_search):
     """Search for the given string in the file and return all the lines of the
     book as a list and list of all the line numbers containing the string"""
     line_number = 0
     mylines = []  # contains all the lines of the book as a list
     index = []  # list of all the line numbers containing the string
-    ar1 = [r'\b']
-    ar1.append(string_to_search.lower())
-    ar1.append(r"\W")
-    ar2 = ''.join(map(str, ar1))
-    ar2.join(ar1)
-    raw = r"{}".format(ar2)
+    string_to_process = string_to_search.replace(
+        '"', r'\"')  # replacing with escape character
+    string_to_process = string_to_process.replace('?', r'\?')
+    string_to_process = list(string_to_process)
+    raw_string = get_raw_string(string_to_process)
     # Open the file in read only mode
     with open(book1, 'r') as read_obj1:
         for line in read_obj1:
             # For each line, check if line contains the string
             line_number += 1
-            if re.search(raw, line.lower()) is not None:
+            if re.search(raw_string, line.lower()) is not None:
                 # if string found, append the line number
                 index.append(line_number)
     if len(index) == 0:  # =if string was found, index list wont be empty
@@ -79,6 +126,7 @@ def quote_find(arg1, page_number):
         str1 += result[0]
         str1 += "\n\n"  # Two nextlines to make it more clean
         str1 += next_line  # Concatinating both the line containing the quote and the next line
+    # print("chapter_heading", chapter_heading)
     if len(chapter_heading) == 0:
         # dummy book+chap name
         chapter_heading.append("0. HP&POS 0: First Page")
@@ -132,8 +180,8 @@ def embed_page(arg, page=0):
     if quote_found_ctr == 1:  # to fix the  UnboundLocalError: local variable 'loc_of_and' referenced before assignment error
         chapter_title, chapter_url = chapter_processing(
             chapter_heading)
-    chapter_desription = chapter_desription + \
-        "\n"+"Page: "+str(page+1)+'/'+str(page_limit)
+    chapter_desription = chapter_desription + "\n" + \
+        "Page: "+str(page+1)+'/'+str(page_limit)
     if quote_found_ctr == 1:
         embed1 = discord.Embed(title=''.join(chapter_title),
                                url=chapter_url,
