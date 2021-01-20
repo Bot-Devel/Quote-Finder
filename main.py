@@ -141,7 +141,7 @@ async def fhelp(ctx):
         return  # None
     if str(ctx.channel.id) in channel:
         des = "To find quotes from the POS fic, use the command- `q.f QUOTE`"+'\n'+"For eg- `q.f Voldemort is back`"+'\n\n' + \
-            "To use the POS Dictionary, use the command- `q.d string`"+'\n'+"For eg- `q.d potter prophecy`"+'\n\n'+"To look at the POS Dictionary Index, use the command- `q.index`" + '\n\n' + "Github Repo- https://github.com/Roguedev1/Quote-Finder" + \
+            "To use the POS Dictionary, use the command- `q.d string`"+'\n'+"For eg- `q.d potter prophecy`"+'\n\n'+"To look at the POS Dictionary Index, use the command- `q.index`" + '\n\n' + "Gitlab Repo- https://gitlab.com/Roguedev1/Quote-Finder/" + \
             '\n'+"Contact the developer for any queries- @RogueOne#2302"
         embed1 = discord.Embed(title='Info',
                                description=des,
