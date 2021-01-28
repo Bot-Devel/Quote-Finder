@@ -37,7 +37,7 @@ def chapter_processing(chap1):
     return chapter_title, url
 
 
-def get_raw_string(string_to_search):
+def get_raw_string(type_of_search, string_to_search):
     """Process the given string and return the regex as a raw string"""
     string_processing = []
     first_word = []
@@ -58,28 +58,36 @@ def get_raw_string(string_to_search):
         rest_of_the_word = ''.join(map(str, rest_of_the_word))
     else:  # if whitespace is not there, its a single word so no seperation of word needed
         first_word = ''.join(map(str, string_to_search))
-    # If the string starts with ", a different regex is needed.
-    # string[1] is being used in if statement because 1st element is a /
-    if string_to_search[1] == "\"":
-        if loc_of_space is not None:
-            string_processing = [r'^[']
-            string_processing.append(first_word.lower())
-            string_processing.append(r']+.')
-            string_processing.append(rest_of_the_word.lower())
+    if type_of_search == 1:  # searching for pos quotes
+        if string_to_search[1] == "\"":
+            # If the string starts with " , a different regex is needed.
+            # string[1] is being used in if statement because 1st element is a "
+            if loc_of_space is not None:
+                string_processing = [r'^[']
+                string_processing.append(first_word.lower())
+                string_processing.append(r']+')
+                string_processing.append(rest_of_the_word.lower())
+                string_processing.append(r"\W")  # to capture comma
+                # converting the list to string
+                raw = ''.join(map(str, string_processing))
+            else:  # if its a single word string
+                string_processing = ['']
+                string_processing.append(first_word.lower())
+                raw = ''.join(map(str, string_processing))
+        else:
             # converting the list to string
+            string_to_search = ''.join(map(str, string_to_search))
+            string_processing = [r'\b']
+            string_processing.append(string_to_search.lower())
+            # Using \b since i dont want it to include . after a word
+            string_processing.append(r"\b")
             raw = ''.join(map(str, string_processing))
-            return raw
-        else:  # if its a single word string
-            string_processing = ['']
-            string_processing.append(first_word.lower())
-            raw = ''.join(map(str, string_processing))
-            return raw
-    else:
-        # converting the list to string
+    elif type_of_search == 2:  # searching for pos dictionary
         string_to_search = ''.join(map(str, string_to_search))
         string_processing = [r'\b']
         string_processing.append(string_to_search.lower())
         # Using \b since i dont want it to include . after a word
         string_processing.append(r"\b")
         raw = ''.join(map(str, string_processing))
-        return raw
+
+    return raw
