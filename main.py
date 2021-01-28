@@ -17,10 +17,11 @@ async def f(ctx, *, arg):
     """
     if ctx.message.author == client.user:
         return  # None
-    msg = list(arg.upper())
+    msg = list(arg.lower())
     channel = ['752196383066554538', '52193632383008770']
-    whitelist = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
+    whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
+                 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
+
     if str(ctx.channel.id) in channel:
         if all(elem in whitelist for elem in msg):  # if msg in whitelist
             embed_pg, page_limit = embed_page(arg)
@@ -66,16 +67,17 @@ async def d(ctx, *, arg):
     """
     if ctx.message.author == client.user:
         return  # None
-    msg = list(arg.upper())
+    msg = list(arg.lower())
     channel = ['752196383066554538', '52193632383008770']
-    whitelist = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
+    whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
+                 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
     if str(ctx.channel.id) in channel:
         if all(elem in whitelist for elem in msg):  # if msg in whitelist
             title, description, quote_found_ctr = pos_dict(arg)
             if quote_found_ctr == 1:
                 embed1 = discord.Embed(
                     title=title,
+                    url="https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing",
                     description=description,
                     colour=discord.Colour(0x272b28))
             elif quote_found_ctr == 0:
