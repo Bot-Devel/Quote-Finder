@@ -1,5 +1,5 @@
 from utils.search import search_string, search_dict
-import pandas as pd
+import json
 
 
 def quote_find(arg1, page_number):
@@ -58,16 +58,15 @@ def quote_find(arg1, page_number):
 
 
 def get_dict_index():
-    """ Read the Title column of the excel file and assign it
-     to index and return the index
+    """ Read the json file and append the title values to the index
+    and return index
     """
-    file1 = "data/POS Dictionary.xlsx"
-    df = pd.read_excel(file1,
-                       sheet_name=0)
-    df.set_index('Title')
-    df.dropna()
-    index = df['Title'].values[:]
-    index = index[~pd.isnull(index)]
+    file = "data/POS Dictionary.json"
+    index = []
+    with open(file, 'r') as read_obj1:
+        data = json.load(read_obj1)
+        for i in data['dictionary']:
+            index.append(i['title'])
     return index
 
 

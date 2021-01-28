@@ -13,7 +13,8 @@ def search_string(book1, book2, string_to_search):
         '"', r'\"')  # replacing with escape character
     string_to_process = string_to_process.replace('?', r'\?')
     string_to_process = list(string_to_process)
-    raw_string = get_raw_string(string_to_process)
+    type_of_search = 1  # searching for pos quotes
+    raw_string = get_raw_string(type_of_search, string_to_process)
     # Open the file in read only mode
     with open(book1, 'r') as read_obj1:
         for line in read_obj1:
@@ -41,7 +42,8 @@ def search_dict(book1, string_to_search):
         '"', r'\"')  # replacing with escape character
     string_to_process = string_to_process.replace('?', r'\?')
     string_to_process = list(string_to_process)
-    raw_string = get_raw_string(string_to_process)
+    type_of_search = 2  # searching for pos dictionary
+    raw_string = get_raw_string(type_of_search, string_to_process)
     quote_found_ctr = 0
     with open(book1, 'r') as read_obj1:
         data = json.load(read_obj1)

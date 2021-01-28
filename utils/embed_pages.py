@@ -32,7 +32,7 @@ def embed_page(arg, page=0):  # page=0 so that 1st page is sent first
         return embed1, page_limit
 
 
-def index_page(i):
+def index_page(page):
     """ Call get_dict_index() & divide_chunks() and return
     the embed & limit
     """
@@ -40,9 +40,10 @@ def index_page(i):
     # Divide the index list into chunks so that there are 10 in each page
     res = list(divide_chunks(des, 10))
     limit = len(res)
-    if i < limit:
+    if page < limit:
         embed1 = discord.Embed(title='POS Dictionary Index',
-                               description='\n'.join(res[i]),
+                               url="https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing",
+                               description='\n'.join(res[page]),
                                colour=discord.Colour(0x272b28))
     else:
         embed1 = discord.Embed(
