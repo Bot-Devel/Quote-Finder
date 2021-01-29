@@ -2,8 +2,7 @@ import os
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
-from utils.embed_pages import embed_page, index_page
-from utils.finder import pos_dict
+from utils.embed_pages import embed_page, index_page, dict_page
 
 from utils.bot_status import keep_alive
 client = commands.Bot(command_prefix=['q.', 'Q.'])
@@ -18,7 +17,7 @@ async def f(ctx, *, arg):
     if ctx.message.author == client.user:
         return  # None
     msg = list(arg.lower())
-    channel = ['752196383066554538', '52193632383008770']
+    channel = ['752196383066554538', '752193632383008770']
     whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
                  'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
 
@@ -68,24 +67,46 @@ async def d(ctx, *, arg):
     if ctx.message.author == client.user:
         return  # None
     msg = list(arg.lower())
-    channel = ['752196383066554538', '52193632383008770']
+    channel = ['752196383066554538', '752193632383008770']
     whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
                  'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"', "'", '…', '*', '-', ':']
     if str(ctx.channel.id) in channel:
         if all(elem in whitelist for elem in msg):  # if msg in whitelist
-            title, description, quote_found_ctr = pos_dict(arg)
-            if quote_found_ctr == 1:
-                embed1 = discord.Embed(
-                    title=title,
-                    url="https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing",
-                    description=description,
-                    colour=discord.Colour(0x272b28))
-            elif quote_found_ctr == 0:
-                embed1 = discord.Embed(
-                    description="Quote not found!",
-                    colour=discord.Colour(0x272b28))
+            embed_pg, page_limit = dict_page(arg)
+            message = await ctx.send(embed=embed_pg)
+            await message.add_reaction('⏮')
+            await message.add_reaction('◀')
+            await message.add_reaction('▶')
+            await message.add_reaction('⏭')
 
-            await ctx.send(embed=embed1)
+            def check(reaction, user):
+                return user == ctx.author
+
+            i = 0
+            reaction = None
+            while True:
+                if str(reaction) == '⏮':
+                    i = 0
+                    embed_pg, page_limit = dict_page(arg, i)
+                    await message.edit(embed=embed_pg)
+                elif str(reaction) == '◀':
+                    if i > 0:
+                        i -= 1
+                        embed_pg, page_limit = dict_page(arg, i)
+                        await message.edit(embed=embed_pg)
+                elif str(reaction) == '▶':
+                    if i < page_limit:
+                        i += 1
+                        embed_pg, page_limit = dict_page(arg, i)
+                        await message.edit(embed=embed_pg)
+                elif str(reaction) == '⏭':
+                    i = page_limit-1
+                    embed_pg, page_limit = dict_page(arg, i)
+                    await message.edit(embed=embed_pg)
+                reaction, user = await client.wait_for('reaction_add', timeout=30.0, check=check)
+                await message.remove_reaction(reaction, user)
+
+            await message.clear_reactions()
 
 
 @client.command(pass_context=True)
@@ -94,7 +115,7 @@ async def index(ctx):
     """
     if ctx.message.author == client.user:
         return  # None
-    channel = ['752196383066554538', '52193632383008770']
+    channel = ['752196383066554538', '752193632383008770']
     if str(ctx.channel.id) in channel:
         # 0 parameter is used in index_page(0) to ensure that the 1st page is sent first
         embed_pg, page_limit = index_page(0)
@@ -138,7 +159,7 @@ async def index(ctx):
 async def fhelp(ctx):
     """ Command to show the info about the different bot commands
     """
-    channel = ['752196383066554538', '52193632383008770']
+    channel = ['752196383066554538', '752193632383008770']
     if ctx.message.author == client.user:
         return  # None
     if str(ctx.channel.id) in channel:
