@@ -1,13 +1,13 @@
 from utils.string_processing import chapter_processing
 import discord
-from utils.finder import get_dict_index, quote_find
+from utils.finder import get_dict_index, quote_find, pos_dict
 
 
 def embed_page(arg, page=0):  # page=0 so that 1st page is sent first
     """ Call quote_find() and process the chapter_title & chapter_url
     and return the embed and page_limit
     """
-    chapter_desription, chapter_heading, quote_found_ctr, page_limit = quote_find(
+    chapter_heading, chapter_desription, quote_found_ctr, page_limit = quote_find(
         arg, page)
     if quote_found_ctr == 1:  # to fix the  UnboundLocalError: local variable 'loc_of_and' referenced before assignment error
         chapter_title, chapter_url = chapter_processing(
@@ -32,7 +32,7 @@ def embed_page(arg, page=0):  # page=0 so that 1st page is sent first
         return embed1, page_limit
 
 
-def index_page(page):
+def index_page(page=0):
     """ Call get_dict_index() & divide_chunks() and return
     the embed & limit
     """
@@ -50,6 +50,26 @@ def index_page(page):
             description="No more index data!",
             colour=discord.Colour(0x272b28))
     return embed1, limit
+
+
+def dict_page(arg, page=0):
+    title, description, quote_found_ctr, page_limit = pos_dict(arg, page)
+    if quote_found_ctr == 1:
+        chapter_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing"
+    elif quote_found_ctr == 0:
+        title = ""
+        chapter_url = ""
+        description = "Dictionary data not found!"
+    elif quote_found_ctr == 2:
+        title = ""
+        chapter_url = ""
+        description = "No more dictionary data found!"
+
+    embed1 = discord.Embed(title=''.join(title),
+                           url=chapter_url,
+                           description=description,
+                           colour=discord.Colour(0x272b28))
+    return embed1, page_limit
 
 
 def divide_chunks(list1, n):
