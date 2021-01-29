@@ -36,23 +36,35 @@ def search_string(book1, book2, string_to_search):
     return mylines, index, quote_found_ctr
 
 
-def search_dict(book1, string_to_search):
+def search_dict(book1, string_to_search, page):
     """Search for the given string in the json file and return the title and description"""
     string_to_process = string_to_search.replace(
         '"', r'\"')  # replacing with escape character
     string_to_process = string_to_process.replace('?', r'\?')
     string_to_process = list(string_to_process)
-    type_of_search = 2  # searching for pos dictionary
+    type_of_search = 2  # searching for pos dictionary search
     raw_string = get_raw_string(type_of_search, string_to_process)
     quote_found_ctr = 0
+    title = []
+    description = []
     with open(book1, 'r') as read_obj1:
         data = json.load(read_obj1)
         for i in data['dictionary']:
             if re.search(raw_string, i['title'].lower()) is not None:
-                title = i['title']
-                description = i['description']
+                title.append(i['title'])
+                description.append(i['description'])
                 quote_found_ctr = 1
+
+    page_limit = len(title)
+    if quote_found_ctr == 1:
+        try:
+            return title[page], description[page], quote_found_ctr, page_limit
+        except IndexError:
+            quote_found_ctr = 2
+            title.append('')
+            description.append('No more dictionary data found!')
+            return title, description, quote_found_ctr, page_limit
     if quote_found_ctr == 0:
-        title = ''
-        description = 'Quote not found!'
-    return title, description, quote_found_ctr
+        title.append('')
+        description.append('Quote not found!')
+        return title, description, quote_found_ctr, page_limit

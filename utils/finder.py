@@ -52,9 +52,9 @@ def quote_find(arg1, page_number):
         chapter_heading.append("0. HP&POS 0: First Page")
     # To fix the embed.description: Must be 2048 or fewer in length error
     if len(list(str1)) > 2048:
-        str1 = str1[:2020] + "..."
+        description = str1[:2020] + "..."
     # chapter_heading[0] contains the chapter heading of the chapter where the quote was found
-    return str1, chapter_heading[0], quote_found_ctr, len(line_number2)
+    return chapter_heading[0], description, quote_found_ctr, len(line_number2)
 
 
 def get_dict_index():
@@ -70,11 +70,16 @@ def get_dict_index():
     return index
 
 
-def pos_dict(arg):
+def pos_dict(arg, page):
     """ Call search_dict() and return title,
     description & quote_found_ctr
     """
     file2 = "data/POS Dictionary.json"
-    title, description, quote_found_ctr = search_dict(
-        file2, arg)
-    return title, description, quote_found_ctr
+    title, description, quote_found_ctr, page_limit = search_dict(
+        file2, arg, page)
+    # To fix the embed.description: Must be 2048 or fewer in length error
+    if len(list(description)) > 2048:
+        description = description[:2020] + "..."
+    description += '\n\n' + "Page: "+str(page+1)+'/'+str(page_limit)
+
+    return title, description, quote_found_ctr, page_limit
