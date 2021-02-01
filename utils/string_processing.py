@@ -79,15 +79,12 @@ def get_raw_string(type_of_search, string_to_search):
             string_to_search = ''.join(map(str, string_to_search))
             string_processing = [r'\b']
             string_processing.append(string_to_search.lower())
-            # Using \b since i dont want it to include . after a word
-            string_processing.append(r"\b")
+            string_processing.append(r"\W")
             raw = ''.join(map(str, string_processing))
     elif type_of_search == 2:  # searching for pos dictionary
         string_to_search = ''.join(map(str, string_to_search))
         string_processing = [r'\b']
         string_processing.append(string_to_search.lower())
-        # Using \b since i dont want it to include . after a word
-        string_processing.append(r"\b")
+        string_processing.append(r"\W")
         raw = ''.join(map(str, string_processing))
-
     return raw
