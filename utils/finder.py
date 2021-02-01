@@ -53,6 +53,8 @@ def quote_find(arg1, page_number):
     # To fix the embed.description: Must be 2048 or fewer in length error
     if len(list(str1)) > 2048:
         description = str1[:2020] + "..."
+    else:
+        description = str1
     # chapter_heading[0] contains the chapter heading of the chapter where the quote was found
     return chapter_heading[0], description, quote_found_ctr, len(line_number2)
 
