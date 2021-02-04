@@ -85,6 +85,6 @@ def get_raw_string(type_of_search, string_to_search):
         string_to_search = ''.join(map(str, string_to_search))
         string_processing = [r'\b']
         string_processing.append(string_to_search.lower())
-        string_processing.append(r"\W")
+        string_processing.append(r"\b")
         raw = ''.join(map(str, string_processing))
     return raw
