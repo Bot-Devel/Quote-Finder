@@ -3,7 +3,7 @@ import discord
 from utils.finder import get_dict_index, quote_find, pos_dict
 
 
-def embed_page(arg, book, page=0):  # page=0 so that 1st page is sent first
+def book_page(arg, book, page=0):  # page=0 so that 1st page is sent first
     """ Call quote_find() and process the chapter_title & chapter_url
     and return the embed and page_limit
     """
