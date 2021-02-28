@@ -36,6 +36,8 @@ class BookSearch(Cog):
         elif str(ctx.channel.id) in bl_channel:
             channel = bl_channel
             book = 2
+        else:
+            ctx.command.reset_cooldown(ctx)
 
         if str(ctx.channel.id) in channel:
             if all(elem in whitelist for elem in msg):  # if msg in whitelist
