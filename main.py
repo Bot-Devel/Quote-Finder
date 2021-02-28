@@ -23,8 +23,8 @@ async def on_command_error(ctx, error):
 
         embed = discord.Embed(
             description=str(error) +
-            "\nThis message will self-destruct in "+timeout +
-            "s. You will be able to use the bot again when this message is deleted."
+            f"\nThis message will self-destruct in {error.retry_after:.2f}s. \
+             You will be able to use the bot again when this message is deleted."
         ).set_footer(text=ctx.message.author)
 
         message = await ctx.send(embed=embed)
