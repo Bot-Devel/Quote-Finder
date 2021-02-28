@@ -73,6 +73,8 @@ class DictionarySearch(Cog):
                     await message.remove_reaction(reaction, user)
 
                 await message.clear_reactions()
+        else:
+            ctx.command.reset_cooldown(ctx)
 
 
 def setup(client):
