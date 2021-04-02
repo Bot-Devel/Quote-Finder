@@ -2,7 +2,7 @@ from utils.search import search_string, search_dict
 import json
 
 
-def quote_find(arg1, page_number, book):
+def quote_find(arg1, page_number, book, use_keywords):
     """Search and find the quote and return both the line containing the quote as well as
      the next line, chapter heading of the chapter where the quote was found
      and quote found counter 
@@ -18,7 +18,7 @@ def quote_find(arg1, page_number, book):
 
     # book_lines=list of all the lines of the book and line_number=line number where string is found
     book_lines, line_number1, quote_found_ctr = search_string(
-        file1, file2, arg1, book)
+        file1, file2, arg1, book, use_keywords)
 
     # Subtracting 1 from the line_number list because of mismatch of line number when all the lines were assigned to list book_lines
     line_number2 = [x - 1 for x in line_number1]
@@ -105,13 +105,13 @@ def get_dict_index():
     return index
 
 
-def pos_dict(arg, page, book):
+def pos_dict(arg, page, book, use_keywords):
     """ Call search_dict() and return title,
     description & quote_found_ctr
     """
     file2 = "data/POS Dictionary.json"
     title, description, quote_found_ctr, page_limit = search_dict(
-        file2, arg, page, book)
+        file2, arg, page, book, use_keywords)
 
     # To fix the embed.description: Must be 2048 or fewer in length error
     if len(list(description)) > 2048:
