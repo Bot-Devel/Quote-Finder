@@ -3,13 +3,13 @@ import discord
 from utils.finder import get_dict_index, quote_find, pos_dict
 
 
-def book_page(arg, book, page=0):  # page=0 so that 1st page is sent first
+def book_page(arg, book, page, use_keywords):  # page=0 so that 1st page is sent first
     """ Call quote_find() and process the chapter_title & chapter_url
     and return the embed and page_limit
     """
 
     chapter_heading, chapter_desription, quote_found_ctr, page_limit = quote_find(
-        arg, page, book)
+        arg, page, book, use_keywords)
 
     if quote_found_ctr == 1:  # to fix the  UnboundLocalError: local variable 'loc_of_and' referenced before assignment error
 
@@ -65,8 +65,9 @@ def index_page(page=0):
     return embed1, limit
 
 
-def dict_page(arg, book, page=0):
-    title, description, quote_found_ctr, page_limit = pos_dict(arg, page, book)
+def dict_page(arg, book, page, use_keywords):
+    title, description, quote_found_ctr, page_limit = pos_dict(
+        arg, page, book, use_keywords)
 
     if quote_found_ctr == 1:
         chapter_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing"

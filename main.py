@@ -13,6 +13,13 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 
 @client.event
+async def on_ready():
+    await client.change_presence(
+        activity=discord.Game(name="qhelp")
+    )
+
+
+@client.event
 async def on_command_error(ctx, error):
 
     # if cooldown error
