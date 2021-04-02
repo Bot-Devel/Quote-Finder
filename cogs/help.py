@@ -23,17 +23,25 @@ class Help(Cog):
             return  # None
 
         if str(ctx.channel.id) in pos_channel:
-            des = "To find quotes from the POS fanfiction, use the command- `qf QUOTE`"+'\n'+"For eg- `qf Voldemort is back`"+'\n\n' + \
-                "To use the POS Dictionary, use the command- `qd string`"+'\n'+"For eg- `qd potter prophecy`"+'\n\n' + \
-                "To look at the POS Dictionary Index, use the command- `qindex`"
+            await ctx.trigger_typing()
+            des = "To find quotes from the POS fanfiction, use the command-\n" + \
+                "`qf QUOTE`\nFor eg- `qf Voldemort is back`\n\n" + \
+                "To search using keywords, use the command-\n`qfk word1 word2`\n " +\
+                "For eg- `qfk sentinel knowledge`\n\nTo use the POS Dictionary, " +\
+                "use the command - `qd string`\nFor eg - `qd potter prophecy`" + \
+                "\n\nIndex number from the POS Dictionary Index can also be used for " +\
+                "dictionary searching.\nFor Eg- `qd 7`" +\
+                "\n\nTo look at the POS Dictionary Index, use the command - `qindex`"
 
             embed1 = discord.Embed(title='Help Menu',
                                    description=des,
                                    colour=discord.Colour(0x272b28))
 
         if str(ctx.channel.id) in bl_channel:
-            des = "To find quotes from the BL fanfiction, use the command- `qf QUOTE`" + \
-                '\n'+"For eg- `qf Arcturus didn't seem`"
+            await ctx.trigger_typing()
+            des = "To find quotes from the BL fanfiction, use the command-\n`qf QUOTE`" + \
+                '\n'+"For eg- `qf Arcturus didn't seem`\n\nTo search using keywords, use the " +\
+                "command- `qfk word1 word2 word3`\nFor eg- `qfk arcturus seem`"
 
             embed1 = discord.Embed(title='Help Menu',
                                    description=des,
