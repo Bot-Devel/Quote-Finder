@@ -25,9 +25,8 @@ class DictionarySearch(Cog):
         # local
         # pos_channel = ['794281211127267330']
 
-        whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
-                     'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"',
-                     "'", '…', '*', '-', ':', '—']
+        with open("data/whitelist.txt", "r") as f:
+            whitelist = f.read().split("\n")
 
         if str(ctx.channel.id) in pos_channel:
             if all(elem in whitelist for elem in msg):  # if msg in whitelist
@@ -100,9 +99,8 @@ class DictionarySearch(Cog):
         # local
         # pos_channel = ['794281211127267330']
 
-        whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
-                     'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"',
-                     "'", '…', '*', '-', ':', '—']
+        with open("data/whitelist.txt", "r") as f:
+            whitelist = f.read().split("\n")
 
         if str(ctx.channel.id) in pos_channel:
             if all(elem in whitelist for elem in msg):  # if msg in whitelist
