@@ -1,5 +1,7 @@
-from utils.string_processing import pos_chapter_processing, bl_chapter_processing
 import discord
+import re
+
+from utils.string_processing import pos_chapter_processing, bl_chapter_processing
 from utils.finder import get_dict_index, quote_find, pos_dict
 
 
@@ -21,7 +23,25 @@ def book_page(arg, book, page, use_keywords):  # page=0 so that 1st page is sent
             chapter_title, chapter_url = bl_chapter_processing(
                 chapter_heading)
 
-    page_footer = "Page: "+str(page+1)+'/'+str(page_limit)
+    page_footer = "Page "+str(page+1)+' of '+str(page_limit)
+
+    # underline search keywords
+    if use_keywords is True:
+        for i in arg.split():
+
+            match = re.findall(i, chapter_desription, re.IGNORECASE)
+
+            for word in match:
+                chapter_desription = re.sub(
+                    fr"\b{word}\b", f"__{word}__", chapter_desription)
+
+    elif use_keywords is False:
+        match = re.findall(
+            arg, chapter_desription.replace("*", ""), re.IGNORECASE)
+
+        for word in match:
+            chapter_desription = re.sub(
+                fr"\b{word}\b", f"__{word}__", chapter_desription.replace("*", ""))
 
     if quote_found_ctr == 1:
         embed1 = discord.Embed(title=''.join(chapter_title),

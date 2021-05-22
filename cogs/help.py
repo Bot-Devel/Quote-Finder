@@ -47,6 +47,8 @@ class Help(Cog):
                                    description=des,
                                    colour=discord.Colour(0x272b28))
 
+        embed1.set_footer(
+            text="The search keywords will be underlined for better readability")
         await ctx.send(embed=embed1)
 
 

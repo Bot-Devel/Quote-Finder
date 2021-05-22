@@ -27,9 +27,8 @@ class BookSearch(Cog):
         # bl_channel = ['809003182306361386']
         # pos_channel = ['794281211127267330']
 
-        whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
-                     'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"',
-                     "'", '…', '*', '-', ':', '—']
+        with open("data/whitelist.txt", "r") as f:
+            whitelist = f.read().split("\n")
 
         if str(ctx.channel.id) in pos_channel:
             book = 1
@@ -93,7 +92,10 @@ class BookSearch(Cog):
                         await message.remove_reaction(reaction, user)
 
                 finally:
-                    await message.clear_reactions()
+                    try:
+                        await message.clear_reactions()
+                    except UnboundLocalError:
+                        pass
         else:
             ctx.command.reset_cooldown(ctx)
 
@@ -115,9 +117,8 @@ class BookSearch(Cog):
         # bl_channel = ['809003182306361386']
         # pos_channel = ['794281211127267330']
 
-        whitelist = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'é',
-                     'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?', ' ', '.', ';', ',', '"',
-                     "'", '…', '*', '-', ':', '—']
+        with open("data/whitelist.txt", "r") as f:
+            whitelist = f.read().split("\n")
 
         if str(ctx.channel.id) in pos_channel:
             book = 1
