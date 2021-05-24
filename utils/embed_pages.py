@@ -1,47 +1,47 @@
 import discord
 import re
 
-from utils.string_processing import pos_chapter_processing, bl_chapter_processing
+import utils.chapter_processing as chapter_processing
 from utils.finder import get_dict_index, quote_find, pos_dict
 
 
-def book_page(arg, book, page, use_keywords):  # page=0 so that 1st page is sent first
+def book_page(arg, book, page, use_keywords):
     """ Call quote_find() and process the chapter_title & chapter_url
-    and return the embed and page_limit
+        and return the embed and page_limit
     """
 
     chapter_heading, chapter_desription, quote_found_ctr, page_limit = quote_find(
         arg, page, book, use_keywords)
 
-    if quote_found_ctr == 1:  # to fix the  UnboundLocalError: local variable 'loc_of_and' referenced before assignment error
+    if quote_found_ctr == 1:
 
-        if book == 1:
-            chapter_title, chapter_url = pos_chapter_processing(
-                chapter_heading)
-
-        elif book == 2:
-            chapter_title, chapter_url = bl_chapter_processing(
-                chapter_heading)
+        chapter_title, chapter_url = chapter_processing.get_chapter_title_url(
+            book, chapter_heading)
 
     page_footer = "Page "+str(page+1)+' of '+str(page_limit)
 
     # underline search keywords
     if use_keywords is True:
         for i in arg.split():
+            chapter_desription = re.sub(r"\\", "", chapter_desription)
+            chapter_desription = chapter_desription.replace("*", "")
 
-            match = re.findall(i, chapter_desription, re.IGNORECASE)
-
+            match = re.findall(
+                arg.replace(r"?", r"\?"), chapter_desription.replace(r"?", r"\?"), re.IGNORECASE)
             for word in match:
                 chapter_desription = re.sub(
-                    fr"\b{word}\b", f"__{word}__", chapter_desription)
+                    fr"{word}", f"__{word}__", chapter_desription.replace(r"?", r"\?"))
 
     elif use_keywords is False:
-        match = re.findall(
-            arg, chapter_desription.replace("*", ""), re.IGNORECASE)
 
+        chapter_desription = re.sub(r"\\", "", chapter_desription)
+        chapter_desription = chapter_desription.replace("*", "")
+
+        match = re.findall(
+            arg.replace(r"?", r"\?"), chapter_desription.replace(r"?", r"\?"), re.IGNORECASE)
         for word in match:
             chapter_desription = re.sub(
-                fr"\b{word}\b", f"__{word}__", chapter_desription.replace("*", ""))
+                fr"{word}", f"__{word}__", chapter_desription.replace(r"?", r"\?"))
 
     if quote_found_ctr == 1:
         embed1 = discord.Embed(title=''.join(chapter_title),

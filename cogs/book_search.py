@@ -4,6 +4,10 @@ from discord.ext.commands.cooldowns import BucketType
 
 from utils.embed_pages import book_page
 
+# live
+bl_channel = ['809014777531727892', '809016986515537950']
+pos_channel = ['752196383066554538', '752193632383008770']
+
 
 class BookSearch(Cog):
     def __init__(self, client):
@@ -18,14 +22,6 @@ class BookSearch(Cog):
         if ctx.message.author == self.client.user:
             return  # None
         msg = list(arg.lower())
-
-        # live
-        bl_channel = ['809014777531727892', '809016986515537950']
-        pos_channel = ['752196383066554538', '752193632383008770']
-
-        # local
-        # bl_channel = ['809003182306361386']
-        # pos_channel = ['794281211127267330']
 
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")
@@ -108,14 +104,6 @@ class BookSearch(Cog):
         if ctx.message.author == self.client.user:
             return  # None
         msg = list(arg.lower())
-
-        # live
-        bl_channel = ['809014777531727892', '809016986515537950']
-        pos_channel = ['752196383066554538', '752193632383008770']
-
-        # local
-        # bl_channel = ['809003182306361386']
-        # pos_channel = ['794281211127267330']
 
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")
