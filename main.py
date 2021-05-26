@@ -8,9 +8,9 @@ from discord.ext import commands
 # to use repl+uptimerobot website monitor
 from utils.bot_uptime import start_server
 
-client = commands.Bot(command_prefix=['f', 'F'], help_command=None)
+client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
 load_dotenv()
-TOKEN = os.getenv('DISCORD_CANARY_TOKEN')
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 
 @client.event

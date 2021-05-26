@@ -1,4 +1,4 @@
-def get_raw_string(type_of_search, string_to_process, book):
+def get_raw_string(type_of_search, string_to_process):
     """Process the given string and return the regex as a raw string"""
     string_processing = []
 
@@ -46,11 +46,9 @@ def get_raw_string(type_of_search, string_to_process, book):
 def get_book(book):
 
     if book == 1:  # prince of slytherin
-        book_pt = "data/books/Harry Potter and the Prince of Slytherin/Harry Potter and the Prince of Slytherin_pt.txt"
-        book_md = "data/books/Harry Potter and the Prince of Slytherin/Harry Potter and the Prince of Slytherin_md.txt"
+        book_md = "data/books/Harry Potter and the Prince of Slytherin_md.txt"
 
     elif book == 2:  # black luminary
-        book_pt = "data/books/Black Luminary/Black Luminary_pt.txt"
-        book_md = "data/books/Black Luminary/Black Luminary_md.txt"
+        book_md = "data/books/Black Luminary_md.txt"
 
-    return book_pt, book_md
+    return book_md

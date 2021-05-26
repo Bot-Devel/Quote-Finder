@@ -21,27 +21,25 @@ def book_page(arg, book, page, use_keywords):
     page_footer = "Page "+str(page+1)+' of '+str(page_limit)
 
     # underline search keywords
-    if use_keywords is True:
-        for i in arg.split():
-            chapter_desription = re.sub(r"\\", "", chapter_desription)
-            chapter_desription = chapter_desription.replace("*", "")
+    for i in arg.split():
 
-            match = re.findall(
-                arg.replace(r"?", r"\?"), chapter_desription.replace(r"?", r"\?"), re.IGNORECASE)
+        # to ignore characters like I,., etc due to the volume.
+        # TODO: Fix the re.sub issue to discard this workaround
+        if len(i) > 1:
+
+            match = re.findall(fr"\b{i}\b", chapter_desription, re.IGNORECASE)
             for word in match:
+
+                # FIXME: Ignore * during re.sub to underline the whole phrase,
+                #  rather than each word
                 chapter_desription = re.sub(
-                    fr"{word}", f"__{word}__", chapter_desription.replace(r"?", r"\?"))
+                    fr"\b{word}\b", f"__{word}__", chapter_desription, re.IGNORECASE)
 
-    elif use_keywords is False:
-
-        chapter_desription = re.sub(r"\\", "", chapter_desription)
-        chapter_desription = chapter_desription.replace("*", "")
-
-        match = re.findall(
-            arg.replace(r"?", r"\?"), chapter_desription.replace(r"?", r"\?"), re.IGNORECASE)
-        for word in match:
-            chapter_desription = re.sub(
-                fr"{word}", f"__{word}__", chapter_desription.replace(r"?", r"\?"))
+    # To fix the embed.description: Must be 2048 or fewer in length error
+    if len(list(chapter_desription)) > 2048:
+        chapter_desription = chapter_desription[:2020] + "..."
+    else:
+        pass
 
     if quote_found_ctr == 1:
         embed1 = discord.Embed(title=''.join(chapter_title),
@@ -85,9 +83,9 @@ def index_page(page=0):
     return embed1, limit
 
 
-def dict_page(arg, book, page, use_keywords):
+def dict_page(arg, page, use_keywords):
     title, description, quote_found_ctr, page_limit = pos_dict(
-        arg, page, book, use_keywords)
+        arg, page, use_keywords)
 
     if quote_found_ctr == 1:
         chapter_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing"

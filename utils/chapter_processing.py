@@ -53,7 +53,6 @@ def default_chapter_processing(chapter_heading, base_url: str):
     # get the chapter number from the heading
     chapter_number = (re.search(r'^\d+\.', chapter_heading)).group(0)
     chapter_number = chapter_number.replace(".", "")
-
     url = base_url+chapter_number
 
     return chapter_heading, url
