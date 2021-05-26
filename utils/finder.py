@@ -1,101 +1,59 @@
-from utils.search import search_string, search_dict
 import json
+
+from utils.search import search_string, search_dict
+from utils.processing import get_book
+from utils.chapter_processing import get_chapter_head_tag
 
 
 def quote_find(arg1, page_number, book, use_keywords):
     """Search and find the quote and return both the line containing the quote as well as
      the next line, chapter heading of the chapter where the quote was found
-     and quote found counter 
+     and quote found counter
      """
 
-    if book == 1:
-        file1 = "data/Harry Potter and the Prince of Slytherin_pt.txt"
-        file2 = "data/Harry Potter and the Prince of Slytherin_md.txt"
+    book_md = get_book(book)
 
-    elif book == 2:
-        file1 = "data/Black Luminary_pt.txt"
-        file2 = "data/Black Luminary_md.txt"
+    # book_lines: list of all the lines of the book
+    # line_number_list1: list of line number where string is found
+    book_lines, line_number_index1, quote_found_ctr = search_string(
+        book_md, arg1, book, use_keywords)
 
-    # book_lines=list of all the lines of the book and line_number=line number where string is found
-    book_lines, line_number1, quote_found_ctr = search_string(
-        file1, file2, arg1, book, use_keywords)
-
-    # Subtracting 1 from the line_number list because of mismatch of line number when all the lines were assigned to list book_lines
-    line_number2 = [x - 1 for x in line_number1]
-    result = []  # list contains the line where the quote was found and the next line
-    chapter_heading = []  # line containg the chapter heading
+    # Subtracting 1 from the line_number list because of mismatch of
+    # line number when all the lines were assigned to list book_lines
+    line_number_index = [x - 1 for x in line_number_index1]
 
     try:
         if quote_found_ctr == 0:  # if no string found in the file
-            return 'err', 'err', quote_found_ctr, len(line_number2)
+            return 'err', 'err', quote_found_ctr, len(line_number_index)
 
-        for i in range(1):
-            result.append(book_lines[line_number2[page_number]].rstrip())
-            # line at which the quote was found
-            if len(line_number2) > page_number:
-                quote_found = line_number2[page_number]
-            else:
-                quote_found = line_number2[len(line_number2)]
-            quote_found_ctr = 1
+        first_line = book_lines[line_number_index[page_number]].rstrip()
+        next_line = book_lines[line_number_index[page_number]+2].rstrip()
+
+        if len(line_number_index) > page_number:
+            quote_found = line_number_index[page_number]
+        else:
+            quote_found = line_number_index[len(line_number_index)]
+        quote_found_ctr = 1
 
     except IndexError:
-        quote_found_ctr = 2  # if the page number croses the len(line_number2)
-        return 'err', 'err', quote_found_ctr, len(line_number2)
+        # if the page number crosses the len(line_number_index)
+        quote_found_ctr = 2
+        return 'err', 'err', quote_found_ctr, len(line_number_index)
 
-    if book == 1:
-        if quote_found < 51316:  # after line number 51316, ". HB&" starts
-            book_tag = ". HP&"  # till chapter 138
-        else:  # book_tag is the identifier used to recognize the book name i.e. HP or HB
-            book_tag = ". HB&"  # from chapter 139
+    book_tag, chapter_heading = get_chapter_head_tag(
+        book, quote_found, book_lines)
 
-    elif book == 2:
-        # book_tag is the identifier used to recognize the book name i.e. HD, VoD, ML
-        if quote_found < 8989:  # after line number 8989, ". VoD" starts
-            book_tag = ". HD"  # till chapter 25
-        elif quote_found < 22301:
-            book_tag = ". VoD"  # till chapter 49
-        else:
-            book_tag = ". ML"  # after chapter 49
-
-    for i in range(quote_found, 0, -1):
-        if book_tag in book_lines[i]:
-            # append all the lines containing the chapter heading from the last chapter to the chapter containing the quote_found
-            chapter_heading.append(book_lines[i])
-
-    quote_found += 2  # line number of the next line after the line where the quote was found
-    next_line = book_lines[quote_found]  # Next line of the quote
-    str1 = ""  # final output string
-
-    for i in range(1):
-        # Assigning the 1st value of the result list i.e. the line containing the quote
-        str1 += result[0]
-        str1 += "\n\n"  # Two nextlines to make it more clean
-        str1 += next_line  # Concatinating both the line containing the quote and the next line
-
-    if book == 1:
-        if len(chapter_heading) == 0:
-            # dummy book+chap name
-            chapter_heading.append("0. HP&POS 0: First Page")
-    elif book == 2:
-        if len(chapter_heading) == 0:
-            # dummy book+chap name
-            chapter_heading.append("0. HD: First Page")
-
-    # To fix the embed.description: Must be 2048 or fewer in length error
-    if len(list(str1)) > 2048:
-        description = str1[:2020] + "..."
-    else:
-        description = str1
+    des = first_line+"\n\n" + next_line  # final output string
 
     # chapter_heading[0] contains the chapter heading of the chapter where the quote was found
-    return chapter_heading[0], description, quote_found_ctr, len(line_number2)
+    return chapter_heading[0], des, quote_found_ctr, len(line_number_index)
 
 
 def get_dict_index():
     """ Read the json file and append the title values to the index
     and return index
     """
-    file = "data/POS Dictionary.json"
+    file = "data/dictionary/POS Dictionary.json"
     index = []
     with open(file, 'r') as read_obj1:
         data = json.load(read_obj1)
@@ -105,13 +63,13 @@ def get_dict_index():
     return index
 
 
-def pos_dict(arg, page, book, use_keywords):
+def pos_dict(arg, page, use_keywords):
     """ Call search_dict() and return title,
     description & quote_found_ctr
     """
-    file2 = "data/POS Dictionary.json"
+    pos_json = "data/dictionary/POS Dictionary.json"
     title, description, quote_found_ctr, page_limit = search_dict(
-        file2, arg, page, book, use_keywords)
+        pos_json, arg, page, use_keywords)
 
     # To fix the embed.description: Must be 2048 or fewer in length error
     if len(list(description)) > 2048:
