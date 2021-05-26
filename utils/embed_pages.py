@@ -20,20 +20,27 @@ def book_page(arg, book, page, use_keywords):
 
     page_footer = "Page "+str(page+1)+' of '+str(page_limit)
 
-    # underline search keywords
-    for i in arg.split():
+    # underline search phrase
+    if use_keywords is True:
+        for i in arg.split():
 
-        # to ignore characters like I,., etc due to the volume.
-        # TODO: Fix the re.sub issue to discard this workaround
-        if len(i) > 1:
+            match = re.findall(i, chapter_desription, re.IGNORECASE)
 
-            match = re.findall(fr"\b{i}\b", chapter_desription, re.IGNORECASE)
             for word in match:
-
-                # FIXME: Ignore * during re.sub to underline the whole phrase,
-                #  rather than each word
                 chapter_desription = re.sub(
-                    fr"\b{word}\b", f"__{word}__", chapter_desription, re.IGNORECASE)
+                    fr"\b{word}\b", f"__{word}__", chapter_desription)
+
+    elif use_keywords is False:
+        arg1 = r"\*{0,}?"
+        arg1 += r"\*{0,}? ".join(arg.split())
+        arg1 += r"\*{0,}? "
+
+        match = re.findall(
+            arg1.strip(), chapter_desription, re.IGNORECASE)
+
+        for word in match:
+            chapter_desription = re.sub(
+                fr"\b{word}\b", f"__{word}__", chapter_desription)
 
     # To fix the embed.description: Must be 2048 or fewer in length error
     if len(list(chapter_desription)) > 2048:
