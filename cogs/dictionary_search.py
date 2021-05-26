@@ -4,6 +4,9 @@ from discord.ext.commands.cooldowns import BucketType
 
 from utils.embed_pages import dict_page
 
+# live
+pos_channel = ['752196383066554538', '752193632383008770']
+
 
 class DictionarySearch(Cog):
     def __init__(self, client):
@@ -18,12 +21,6 @@ class DictionarySearch(Cog):
         if ctx.message.author == self.client.user:
             return  # None
         msg = list(arg.lower())
-
-        # live
-        pos_channel = ['752196383066554538', '752193632383008770']
-
-        # local
-        # pos_channel = ['794281211127267330']
 
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")
@@ -92,12 +89,6 @@ class DictionarySearch(Cog):
         if ctx.message.author == self.client.user:
             return  # None
         msg = list(arg.lower())
-
-        # live
-        pos_channel = ['752196383066554538', '752193632383008770']
-
-        # local
-        # pos_channel = ['794281211127267330']
 
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")

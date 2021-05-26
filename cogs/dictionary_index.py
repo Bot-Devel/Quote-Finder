@@ -2,6 +2,9 @@ from discord.ext.commands import command, Cog
 
 from utils.embed_pages import index_page
 
+# live
+pos_channel = ['752196383066554538', '752193632383008770']
+
 
 class DictionaryIndex(Cog):
     def __init__(self, client):
@@ -13,12 +16,6 @@ class DictionaryIndex(Cog):
         """
         if ctx.message.author == self.client.user:
             return  # None
-
-        # live
-        pos_channel = ['752196383066554538', '752193632383008770']
-
-        # local
-        # pos_channel = ['794281211127267330']
 
         if str(ctx.channel.id) in pos_channel:
             try:

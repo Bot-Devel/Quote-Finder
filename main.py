@@ -5,7 +5,8 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 
-from utils.bot_status import keep_alive
+# to use repl+uptimerobot website monitor
+from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
 load_dotenv()
@@ -39,7 +40,10 @@ async def on_command_error(ctx, error):
         await asyncio.sleep(int(timeout))
         await message.delete()
 
-keep_alive()
+    else:
+        print(error)
+
+start_server()
 client.load_extension("cogs.book_search")
 client.load_extension("cogs.dictionary_search")
 client.load_extension("cogs.dictionary_index")

@@ -7,4 +7,4 @@
 # │ │ │ │ │
 # │ │ │ │ │
 # * * * * * <command to execute>
-00 22 * * 7 '~/Personal/Git/Quote Finder/POS Files/pos-ff.sh' 2>&1 | '~/Personal/Git/Quote Finder/POS Files/timestamp.sh' >> '~/Personal/Git/Quote Finder/POS Files/cron.log' 
+00 22 * * 7 '~/Personal/Git/Quote Finder/POS Files/fetchEbook.sh' 2>&1 | '~/Personal/Git/Quote Finder/POS Files/timestamp.sh' >> '~/Personal/Git/Quote Finder/POS Files/cron.log' 
