@@ -2,21 +2,24 @@ import re
 from discord.ext.commands import command, Cog, cooldown
 from discord.ext.commands.cooldowns import BucketType
 
-from utils.embed_pages import book_page
+from utils.embed_pages import dict_page
+from exts import config
 
-# live
-bl_channel = ['809014777531727892', '809016986515537950']
-pos_channel = ['752196383066554538', '752193632383008770']
+pos_channel_cooldown = [x.strip() for x in (config.get(
+    'cooldown channels', 'pos_channel')).split(",")]
+
+pos_channel_whitelist = [x.strip() for x in (config.get(
+    'whitelist channels', 'pos_channel')).split(",")]
 
 
-class BookSearch(Cog):
+class DictionarySearch(Cog):
     def __init__(self, client):
         self.client = client
 
     @cooldown(1, 15, BucketType.user)
-    @command(name='f', pass_context=True)
-    async def search_book(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+    @command(name='d', pass_context=True)
+    async def search_dictionary(self, ctx, *, arg):
+        """ Command to search and find the dictionary phrase from a json file
         """
         use_keywords = False
         if ctx.message.author == self.client.user:
@@ -26,25 +29,17 @@ class BookSearch(Cog):
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")
 
-        if str(ctx.channel.id) in pos_channel:
-            book = 1
-            channel = pos_channel
-
-        elif str(ctx.channel.id) in bl_channel:
-            channel = bl_channel
-            book = 2
-        else:
+        if str(ctx.channel.id) in pos_channel_whitelist:
             ctx.command.reset_cooldown(ctx)
 
-        if str(ctx.channel.id) in channel:
+        if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             if all(elem in whitelist for elem in msg):  # if msg in whitelist
                 try:
                     await ctx.trigger_typing()
-                    embed_pg, page_limit = book_page(
-                        arg, book, 0, use_keywords)
+                    embed_pg, page_limit = dict_page(arg, 0, use_keywords)
 
                     if re.search(
-                            "^quote not found!".lower(), embed_pg.description.lower()) is not None:
+                            "^dictionary data not found!", embed_pg.description.lower()) is not None:
                         ctx.command.reset_cooldown(ctx)
 
                     message = await ctx.send(embed=embed_pg)
@@ -57,48 +52,45 @@ class BookSearch(Cog):
                     def check(reaction, user):
                         return user == ctx.author and reaction.message.id == message.id
 
-                    i = 0
+                    page = 0
                     reaction = None
                     while True:
                         reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
                         if str(reaction) == '⏮':
-                            i = 0
-                            embed_pg, page_limit = book_page(
-                                arg, book, i, use_keywords)
+                            page = 0
+                            embed_pg, page_limit = dict_page(
+                                arg, page, use_keywords)
                             await message.edit(embed=embed_pg)
                         elif str(reaction) == '◀':
-                            if i > 0:
-                                i -= 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, i, use_keywords)
+                            if page > 0:
+                                page -= 1
+                                embed_pg, page_limit = dict_page(
+                                    arg, page, use_keywords)
                                 await message.edit(embed=embed_pg)
                         elif str(reaction) == '▶':
-                            if i < page_limit:
-                                i += 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, i, use_keywords)
+                            if page < page_limit:
+                                page += 1
+                                embed_pg, page_limit = dict_page(
+                                    arg, page, use_keywords)
                                 await message.edit(embed=embed_pg)
                         elif str(reaction) == '⏭':
-                            i = page_limit-1
-                            embed_pg, page_limit = book_page(
-                                arg, book, i, use_keywords)
+                            page = page_limit-1
+                            embed_pg, page_limit = dict_page(
+                                arg, page, use_keywords)
                             await message.edit(embed=embed_pg)
 
                         await message.remove_reaction(reaction, user)
 
                 finally:
-                    try:
-                        await message.clear_reactions()
-                    except UnboundLocalError:
-                        pass
+                    await message.clear_reactions()
         else:
             ctx.command.reset_cooldown(ctx)
 
     @cooldown(1, 15, BucketType.user)
-    @command(name='fk', pass_context=True)
-    async def search_book_keys(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+    @command(name='dk', pass_context=True)
+    async def search_dictionary_keys(self, ctx, *, arg):
+        """ Command to search and find the dictionary phrase from a json file
         """
         use_keywords = True
         if ctx.message.author == self.client.user:
@@ -108,25 +100,14 @@ class BookSearch(Cog):
         with open("data/whitelist.txt", "r") as f:
             whitelist = f.read().split("\n")
 
-        if str(ctx.channel.id) in pos_channel:
-            book = 1
-            channel = pos_channel
-
-        elif str(ctx.channel.id) in bl_channel:
-            channel = bl_channel
-            book = 2
-        else:
-            ctx.command.reset_cooldown(ctx)
-
-        if str(ctx.channel.id) in channel:
+        if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             if all(elem in whitelist for elem in msg):  # if msg in whitelist
                 try:
                     await ctx.trigger_typing()
-                    embed_pg, page_limit = book_page(
-                        arg, book, 0, use_keywords)
+                    embed_pg, page_limit = dict_page(arg, 0, use_keywords)
 
                     if re.search(
-                            "^quote not found!".lower(), embed_pg.description.lower()) is not None:
+                            "^dictionary data not found!", embed_pg.description.lower()) is not None:
                         ctx.command.reset_cooldown(ctx)
 
                     message = await ctx.send(embed=embed_pg)
@@ -139,32 +120,32 @@ class BookSearch(Cog):
                     def check(reaction, user):
                         return user == ctx.author and reaction.message.id == message.id
 
-                    i = 0
+                    page = 0
                     reaction = None
                     while True:
                         reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
                         if str(reaction) == '⏮':
-                            i = 0
-                            embed_pg, page_limit = book_page(
-                                arg, book, i, use_keywords)
+                            page = 0
+                            embed_pg, page_limit = dict_page(
+                                arg, page, use_keywords)
                             await message.edit(embed=embed_pg)
                         elif str(reaction) == '◀':
-                            if i > 0:
-                                i -= 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, i, use_keywords)
+                            if page > 0:
+                                page -= 1
+                                embed_pg, page_limit = dict_page(
+                                    arg, page, use_keywords)
                                 await message.edit(embed=embed_pg)
                         elif str(reaction) == '▶':
-                            if i < page_limit:
-                                i += 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, i, use_keywords)
+                            if page < page_limit:
+                                page += 1
+                                embed_pg, page_limit = dict_page(
+                                    arg, page, use_keywords)
                                 await message.edit(embed=embed_pg)
                         elif str(reaction) == '⏭':
-                            i = page_limit-1
-                            embed_pg, page_limit = book_page(
-                                arg, book, i, use_keywords)
+                            page = page_limit-1
+                            embed_pg, page_limit = dict_page(
+                                arg,  page, use_keywords)
                             await message.edit(embed=embed_pg)
 
                         await message.remove_reaction(reaction, user)
@@ -176,4 +157,4 @@ class BookSearch(Cog):
 
 
 def setup(client):
-    client.add_cog(BookSearch(client))
+    client.add_cog(DictionarySearch(client))

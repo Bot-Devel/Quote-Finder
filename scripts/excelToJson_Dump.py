@@ -6,7 +6,7 @@ def get_dict_index():
     """ Read the Title column of the excel file and assign it
      to two index for each sheet and return the indices
     """
-    file1 = "data/POS Dictionary.xlsx"
+    file1 = "data/dictionary/POS Dictionary.xlsx"
     df1 = pd.read_excel(file1,
                         "Sheet2")  # Read sheet2 first since that one contains all the word definitions
     df2 = pd.read_excel(file1,
@@ -25,7 +25,7 @@ def get_dict_index():
 def ExcelToJson():
     """ Reads the excel sheet and then writes to the json file
     """
-    file1 = "data/POS Dictionary.xlsx"
+    file1 = "data/dictionary/POS Dictionary.xlsx"
     data = {}
     data['dictionary'] = []
     index1, index2 = get_dict_index()
@@ -47,7 +47,7 @@ def ExcelToJson():
             'title': str(i+1)+") "+str(index2[j]),
             'description': str(df2.loc[index2[j]][0]),
         })
-    with open('data/POS Dictionary.json', 'w') as outfile:
+    with open('data/dictionary/POS Dictionary.json', 'w') as outfile:
         json.dump(data, outfile)
 
 

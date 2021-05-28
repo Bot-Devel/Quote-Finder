@@ -1,9 +1,13 @@
 from discord.ext.commands import command, Cog
 
 from utils.embed_pages import index_page
+from exts import config
 
-# live
-pos_channel = ['752196383066554538', '752193632383008770']
+pos_channel_cooldown = [x.strip() for x in (config.get(
+    'cooldown channels', 'pos_channel')).split(",")]
+
+pos_channel_whitelist = [x.strip() for x in (config.get(
+    'whitelist channels', 'pos_channel')).split(",")]
 
 
 class DictionaryIndex(Cog):
@@ -17,10 +21,9 @@ class DictionaryIndex(Cog):
         if ctx.message.author == self.client.user:
             return  # None
 
-        if str(ctx.channel.id) in pos_channel:
+        if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:
                 await ctx.trigger_typing()
-                # 0 parameter is used in index_page(0) to ensure that the 1st page is sent first
                 embed_pg, page_limit = index_page(0)
                 message = await ctx.send(embed=embed_pg)
                 await message.add_reaction('⏮')
@@ -31,28 +34,28 @@ class DictionaryIndex(Cog):
                 def check(reaction, user):
                     return user == ctx.author and reaction.message.id == message.id
 
-                i = 0
+                page = 0
                 reaction = None
                 while True:
                     reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
-                        i = 0
-                        embed_pg, page_limit = index_page(i)
+                        page = 0
+                        embed_pg, page_limit = index_page(page)
                         await message.edit(embed=embed_pg)
                     elif str(reaction) == '◀':
-                        if i > 0:
-                            i -= 1
-                            embed_pg, page_limit = index_page(i)
+                        if page > 0:
+                            page -= 1
+                            embed_pg, page_limit = index_page(page)
                             await message.edit(embed=embed_pg)
                     elif str(reaction) == '▶':
-                        if i < page_limit:
-                            i += 1
-                            embed_pg, page_limit = index_page(i)
+                        if page < page_limit:
+                            page += 1
+                            embed_pg, page_limit = index_page(page)
                             await message.edit(embed=embed_pg)
                     elif str(reaction) == '⏭':
-                        i = page_limit-1
-                        embed_pg, page_limit = index_page(i)
+                        page = page_limit-1
+                        embed_pg, page_limit = index_page(page)
                         await message.edit(embed=embed_pg)
 
                     await message.remove_reaction(reaction, user)
