@@ -10,7 +10,7 @@ def book_page(arg, book, page, use_keywords):
         and return the embed and page_limit
     """
 
-    chapter_heading, chapter_desription, quote_found_ctr, page_limit = quote_find(
+    chapter_heading, chapter_description, quote_found_ctr, page_limit = quote_find(
         arg, page, book, use_keywords)
 
     if quote_found_ctr == 1:
@@ -24,11 +24,11 @@ def book_page(arg, book, page, use_keywords):
     if use_keywords is True:
         for i in arg.split():
 
-            match = re.findall(i, chapter_desription, re.IGNORECASE)
+            match = re.findall(i, chapter_description, re.IGNORECASE)
 
             for word in match:
-                chapter_desription = re.sub(
-                    fr"\b{word}\b", f"__{word}__", chapter_desription)
+                chapter_description = re.sub(
+                    fr"\b{word}\b", f"__{word}__", chapter_description)
 
     elif use_keywords is False:
         arg1 = r"\*{0,}?"
@@ -36,22 +36,22 @@ def book_page(arg, book, page, use_keywords):
         arg1 += r"\*{0,}? "
 
         match = re.findall(
-            arg1.strip(), chapter_desription, re.IGNORECASE)
+            arg1.strip(), chapter_description, re.IGNORECASE)
 
         for word in match:
-            chapter_desription = re.sub(
-                fr"\b{word}\b", f"__{word}__", chapter_desription)
+            chapter_description = re.sub(
+                fr"\b{word}\b", f"__{word}__", chapter_description)
 
     # To fix the embed.description: Must be 2048 or fewer in length error
-    if len(list(chapter_desription)) > 2048:
-        chapter_desription = chapter_desription[:2020] + "..."
+    if len(list(chapter_description)) > 2048:
+        chapter_description = chapter_description[:2020] + "..."
     else:
         pass
 
     if quote_found_ctr == 1:
         embed1 = discord.Embed(title=''.join(chapter_title),
                                url=chapter_url,
-                               description=chapter_desription,
+                               description=chapter_description,
                                colour=discord.Colour(0x272b28))
         embed1.set_footer(text=page_footer)
 

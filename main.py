@@ -41,11 +41,11 @@ async def on_command_error(ctx, error):
         await message.delete()
 
     else:
-        print(error)
+        pass
 
 start_server()
-client.load_extension("cogs.book_search")
-client.load_extension("cogs.dictionary_search")
-client.load_extension("cogs.dictionary_index")
-client.load_extension("cogs.help")
+client.load_extension("exts.cogs.book_search")
+client.load_extension("exts.cogs.dictionary_search")
+client.load_extension("exts.cogs.dictionary_index")
+client.load_extension("exts.cogs.help")
 client.run(TOKEN)
