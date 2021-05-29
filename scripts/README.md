@@ -14,15 +14,13 @@ This script uses [FanFicFare](https://github.com/JimmXinu/FanFicFare) to update/
 - The directory names can be changed as necessary when running the script locally.
 - If you want to run the `fetchEbook.sh` without any changes to the directory paths, create an `ebook processing/` sub-directory in the root directory of the repository and create `ebook processing/Downloaded/` & `ebook processing/Processed/` sub-directories inside the `ebook processing/` parent directory.
 
+- `ebook processing/` is included in the `.gitignore` file.
+
 ## fixFormatMD.py
 
 A simple command-line script which takes the markdown txt file as the input, removes unnecessary formatting as needed and outputs the cleaned markdown file.
 
 Run the script at the root directory of the repository.
-
-### Note
-
-- `ebook processing/` is included in the `.gitignore` file.
 
 ## excelToJson.py
 
