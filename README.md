@@ -22,8 +22,8 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Install Python >=3.8.5
 - Create a python virtual environment in which you will be installing all the dependencies and activate it before installing the dependencies.
-- Install the dependencies using `pip install -r requirements_dev.txt`
 - Fork the repository and clone the fork in a directory and create a new branch for your development. Do not add new features to the `main` branch.
+- Install the dependencies using `pip install -r requirements_dev.txt`
 - Rename the `.env.ex` file to `.env` which should contain the `DISCORD_TOKEN` for your testing bot.
 - Create a testing bot from the [Discord Developer Portal](https://discord.com/developers/applications) and copy the bot token to the `.env` file.
 - Run the bot using `python main.py` in the root directory.
