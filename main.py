@@ -1,11 +1,13 @@
 import os
 import re
 import asyncio
-import discord
-from dotenv import load_dotenv
-from discord.ext import commands
+import requests
 
-# to use repl+uptimerobot website monitor
+import discord
+from discord.ext import commands, tasks
+from dotenv import load_dotenv
+
+# to use repl+uptime monitor
 from utils.bot_uptime import start_server
 
 client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
@@ -18,6 +20,17 @@ async def on_ready():
     await client.change_presence(
         activity=discord.Game(name="qhelp")
     )
+
+
+@tasks.loop(seconds=10.0)
+async def bot_uptime():
+
+    await client.wait_until_ready()
+
+    while not client.is_closed():
+
+        requests.get("https://quote-finder-bot.roguedev1.repl.co/")
+        await asyncio.sleep(30)
 
 
 @client.event
@@ -43,6 +56,7 @@ async def on_command_error(ctx, error):
     else:
         pass
 
+bot_uptime.start()
 start_server()
 client.load_extension("exts.cogs.book_search")
 client.load_extension("exts.cogs.dictionary_search")
