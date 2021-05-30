@@ -31,9 +31,9 @@ def book_page(arg, book, page, use_keywords):
                     fr"\b{word}\b", f"__{word}__", chapter_description)
 
     elif use_keywords is False:
-        arg1 = r"\*{0,}?"
+        arg1 = r"\b\*{0,}?"
         arg1 += r"\*{0,}? ".join(arg.split())
-        arg1 += r"\*{0,}? "
+        arg1 += r"\*{0,}?\b"
 
         match = re.findall(
             arg1.strip(), chapter_description, re.IGNORECASE)
