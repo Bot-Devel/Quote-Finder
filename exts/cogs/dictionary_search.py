@@ -42,6 +42,7 @@ class DictionarySearch(Cog):
                             "^dictionary data not found!", embed_pg.description.lower()) is not None:
                         ctx.command.reset_cooldown(ctx)
 
+<<<<<<< HEAD
                     try:
                         message = await ctx.message.reply(
                             embed=embed_pg, mention_author=False)
@@ -49,6 +50,10 @@ class DictionarySearch(Cog):
                     except Exception:
                         message = await ctx.message.channel.send(
                             embed=embed_pg)
+=======
+                    message = await ctx.message.reply(
+                        embed=embed_pg, mention_author=False)
+>>>>>>> e30fd89cb1d42c843350dc764e2e0a3843e57df6
 
                     await message.add_reaction('⏮')
                     await message.add_reaction('◀')
@@ -116,6 +121,7 @@ class DictionarySearch(Cog):
                             "^dictionary data not found!", embed_pg.description.lower()) is not None:
                         ctx.command.reset_cooldown(ctx)
 
+<<<<<<< HEAD
                     try:
                         message = await ctx.message.reply(
                             embed=embed_pg, mention_author=False)
@@ -123,6 +129,10 @@ class DictionarySearch(Cog):
                     except Exception:
                         message = await ctx.message.channel.send(
                             embed=embed_pg)
+=======
+                    message = await ctx.message.reply(
+                        embed=embed_pg, mention_author=False)
+>>>>>>> e30fd89cb1d42c843350dc764e2e0a3843e57df6
 
                     await message.add_reaction('⏮')
                     await message.add_reaction('◀')
