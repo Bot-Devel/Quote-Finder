@@ -10,23 +10,27 @@ def pos_chapter_processing(chapter_heading):
     for i in range(0, len(chapter_heading_list)):
         if '&' == chapter_heading_list[i]:
             loc_of_and = i  # location of "&" in the chapter heading list
-            # incrementing 4 will put the index at the chapter number 
+            # incrementing 4 will put the index at the chapter number
             # of the chapter i.e. "1" in  139. HB&TRG 1: In Which Plans Are Made
-            loc_of_and += 4 
+            loc_of_and += 4
             break  # Sometimes there are two or more &s, without break, the index is overwritten
 
     chapter_template = ['C', 'h', 'a', 'p', 't', 'e', 'r', ' ']
     book_name = []  # Contains the global chapter number and the book name i.e. 134. HP&DEM |
-    # complete chapter title of the chapter where the quote was found 
+    # complete chapter title of the chapter where the quote was found
     # i.e 134. HP&DEM | Chapter 50: The King of Rats
-    chapter_title = []  
+    chapter_title = []
 
-    for i in range(loc_of_and, len(chapter_heading_list)):
-        # Appending the chapter number and name i.e. Chapter 50: The King of Rats
-        chapter_template.append(chapter_heading_list[i])
-    for i in range(0, loc_of_and):
-        # Appending the global chapter number and book name i.e 134. HP&DEM
-        book_name.append(chapter_heading_list[i])
+    try:
+        for i in range(loc_of_and, len(chapter_heading_list)):
+            # Appending the chapter number and name i.e. Chapter 50: The King of Rats
+            chapter_template.append(chapter_heading_list[i])
+        for i in range(0, loc_of_and):
+            # Appending the global chapter number and book name i.e 134. HP&DEM
+            book_name.append(chapter_heading_list[i])
+
+    except UnboundLocalError:  # first page
+        book_name.append("First Page")
 
     book_name.append(" | ")
     # concatenating the book name and chapter name lists
@@ -73,7 +77,7 @@ def get_chapter_head_tag(book, quote_found, book_lines):
     if book == 1:  # prince of slytherin
         if quote_found < 51316:  # after line number 51316, "HB" starts
             book_tag = ". HP&"  # till chapter 138
-        else: 
+        else:
             book_tag = ". HB&"  # from chapter 139
 
     elif book == 2:  # black luminary

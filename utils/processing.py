@@ -3,34 +3,37 @@ def get_raw_string(type_of_search, string_to_process):
     string_processing = []
 
     if type_of_search == 1:  # searching for book quotes
+        try:
+            if string_to_process[1] == "\"":
+                # string[1] because 1st two elements are \ & " respectively
+                string_processing = [r'^[\"]+']
 
-        if string_to_process[1] == "\"":
-            # string[1] because 1st two elements are \ & " respectively
-            string_processing = [r'^[\"]+']
+                # pop the 1st two elements out since they are \ & " respectively
+                string_to_process = string_to_process[2:]
+                string_processing.append(string_to_process.lower())
 
-            # pop the 1st two elements out since they are \ & " respectively
-            string_to_process = string_to_process[2:]
-            string_processing.append(string_to_process.lower())
+                raw = ''.join(map(str, string_processing))
 
-            raw = ''.join(map(str, string_processing))
+            elif string_to_process[0] == "\'":
+                # string[0] because 1st element is '
 
-        elif string_to_process[0] == "\'":
-            # string[0] because 1st element is '
+                string_processing = [r'^[\']+']
 
-            string_processing = [r'^[\']+']
+                # pop the 1st elements out since its '
+                string_to_process = string_to_process[1:]
+                string_processing.append(string_to_process.lower())
 
-            # pop the 1st elements out since its '
-            string_to_process = string_to_process[1:]
-            string_processing.append(string_to_process.lower())
+                raw = ''.join(map(str, string_processing))
 
-            raw = ''.join(map(str, string_processing))
+            else:
 
-        else:
+                string_processing = [r'\b']
+                string_processing.append(string_to_process.lower())
+                string_processing.append(r"\W")
+                raw = ''.join(map(str, string_processing))
 
-            string_processing = [r'\b']
-            string_processing.append(string_to_process.lower())
-            string_processing.append(r"\W")
-            raw = ''.join(map(str, string_processing))
+        except IndexError:
+            return f"\b{string_to_process[0]}\W"
 
     elif type_of_search == 2:  # searching for pos dictionary
 
