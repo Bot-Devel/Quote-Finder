@@ -27,12 +27,13 @@ def search_string(book_md, string_to_search, book, use_keywords):
 
     with open(book_md, 'r') as read_obj1:
         for line in read_obj1:
-
+            
+            line_number += 1
             # remove markdown
             line1 = re.sub(r'\*', '', line, flags=re.M)
             line2 = re.sub(r'\\', '', line1, flags=re.M)
+        
             # For each line, check if line contains the string
-            line_number += 1
             if re.search(raw_string, line2, re.IGNORECASE) is not None:
                 # if string found, append the line number
                 line_number_index1.append(line_number)

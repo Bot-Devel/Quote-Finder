@@ -32,7 +32,8 @@ async def bot_uptime():
         requests.get("https://quote-finder-bot.roguedev1.repl.co/")
         await asyncio.sleep(30)
 
-
+# Comment out this function during development to see the 
+# traceback of all the errors
 @client.event
 async def on_command_error(ctx, error):
 
@@ -54,7 +55,7 @@ async def on_command_error(ctx, error):
         await message.delete()
 
     else:
-        pass
+        print(error)
 
 bot_uptime.start()
 start_server()
