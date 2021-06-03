@@ -10,19 +10,27 @@ def pos_chapter_processing(chapter_heading):
     for i in range(0, len(chapter_heading_list)):
         if '&' == chapter_heading_list[i]:
             loc_of_and = i  # location of "&" in the chapter heading list
-            loc_of_and += 4  # incrementing 4 will put the index at the chapter number of the chapter i.e. "1" in  139. HB&TRG 1: In Which Plans Are Made
+            # incrementing 4 will put the index at the chapter number
+            # of the chapter i.e. "1" in  139. HB&TRG 1: In Which Plans Are Made
+            loc_of_and += 4
             break  # Sometimes there are two or more &s, without break, the index is overwritten
 
     chapter_template = ['C', 'h', 'a', 'p', 't', 'e', 'r', ' ']
     book_name = []  # Contains the global chapter number and the book name i.e. 134. HP&DEM |
-    chapter_title = []  # complete chapter title of the chapter where the quote was found i.e 134. HP&DEM | Chapter 50: The King of Rats
+    # complete chapter title of the chapter where the quote was found
+    # i.e 134. HP&DEM | Chapter 50: The King of Rats
+    chapter_title = []
 
-    for i in range(loc_of_and, len(chapter_heading_list)):
-        # Appending the chapter number and name i.e. Chapter 50: The King of Rats
-        chapter_template.append(chapter_heading_list[i])
-    for i in range(0, loc_of_and):
-        # Appending the global chapter number and book name i.e 134. HP&DEM
-        book_name.append(chapter_heading_list[i])
+    try:
+        for i in range(loc_of_and, len(chapter_heading_list)):
+            # Appending the chapter number and name i.e. Chapter 50: The King of Rats
+            chapter_template.append(chapter_heading_list[i])
+        for i in range(0, loc_of_and):
+            # Appending the global chapter number and book name i.e 134. HP&DEM
+            book_name.append(chapter_heading_list[i])
+
+    except UnboundLocalError:  # first page
+        book_name.append("First Page")
 
     book_name.append(" | ")
     # concatenating the book name and chapter name lists
@@ -65,15 +73,15 @@ def get_chapter_head_tag(book, quote_found, book_lines):
 
     chapter_heading = []  # line containg the chapter heading
 
-    # book_tag is the identifier used to recognize the book name i.e. HD, VoD, ML
+    # book_tag is the identifier used to recognize the book name i.e. HP, HB, VoD, ML
     if book == 1:  # prince of slytherin
-        if quote_found < 51316:  # after line number 51316, ". HB&" starts
+        if quote_found < 51316:  # after line number 51316, "HB" starts
             book_tag = ". HP&"  # till chapter 138
-        else:  # book_tag is the identifier used to recognize the book name i.e. HP or HB
+        else:
             book_tag = ". HB&"  # from chapter 139
 
     elif book == 2:  # black luminary
-        if quote_found < 8989:  # after line number 8989, ". VoD" starts
+        if quote_found < 8989:  # after line number 8989, "VoD" starts
             book_tag = ". HD"  # till chapter 25
         elif quote_found < 22301:
             book_tag = ". VoD"  # till chapter 49

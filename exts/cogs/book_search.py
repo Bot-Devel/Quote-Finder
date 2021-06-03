@@ -19,10 +19,6 @@ class BookSearch(Cog):
         use_keywords = False
         if ctx.message.author == self.client.user:
             return  # None
-        msg = list(arg.lower())
-
-        with open("data/whitelist.txt", "r") as f:
-            whitelist = f.read().split("\n")
 
         reset_flag = False
         book, channel, reset_flag = check_channel(ctx.channel.id, reset_flag)
@@ -31,67 +27,67 @@ class BookSearch(Cog):
             ctx.command.reset_cooldown(ctx)
 
         if str(ctx.channel.id) in channel:
-            if all(elem in whitelist for elem in msg):  # if msg in whitelist
+            try:
+                await ctx.trigger_typing()
+                embed_pg, page_limit = book_page(
+                    arg, book, 0, use_keywords)
+
+                if re.search(
+                    "^quote not found!".lower(),
+                        embed_pg.description.lower()) is not None:
+                    ctx.command.reset_cooldown(ctx)
+
                 try:
-                    await ctx.trigger_typing()
-                    embed_pg, page_limit = book_page(
-                        arg, book, 0, use_keywords)
+                    message = await ctx.message.reply(
+                        embed=embed_pg, mention_author=False)
 
-                    if re.search(
-                            "^quote not found!".lower(), embed_pg.description.lower()) is not None:
-                        ctx.command.reset_cooldown(ctx)
+                except Exception:
+                    message = await ctx.message.channel.send(
+                        embed=embed_pg)
 
-                    try:
-                        message = await ctx.message.reply(
-                            embed=embed_pg, mention_author=False)
+                await message.add_reaction('⏮')
+                await message.add_reaction('◀')
+                await message.add_reaction('▶')
+                await message.add_reaction('⏭')
 
-                    except Exception:
-                        message = await ctx.message.channel.send(
-                            embed=embed_pg)
+                def check(reaction, user):
+                    return user == ctx.author and reaction.message.id == message.id
 
-                    await message.add_reaction('⏮')
-                    await message.add_reaction('◀')
-                    await message.add_reaction('▶')
-                    await message.add_reaction('⏭')
+                page = 0
+                reaction = None
+                while True:
+                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
-                    def check(reaction, user):
-                        return user == ctx.author and reaction.message.id == message.id
-
-                    page = 0
-                    reaction = None
-                    while True:
-                        reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
-
-                        if str(reaction) == '⏮':
-                            page = 0
+                    if str(reaction) == '⏮':
+                        page = 0
+                        embed_pg, page_limit = book_page(
+                            arg, book, page, use_keywords)
+                        await message.edit(embed=embed_pg)
+                    elif str(reaction) == '◀':
+                        if page > 0:
+                            page -= 1
                             embed_pg, page_limit = book_page(
                                 arg, book, page, use_keywords)
                             await message.edit(embed=embed_pg)
-                        elif str(reaction) == '◀':
-                            if page > 0:
-                                page -= 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, page, use_keywords)
-                                await message.edit(embed=embed_pg)
-                        elif str(reaction) == '▶':
-                            if page < page_limit:
-                                page += 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, page, use_keywords)
-                                await message.edit(embed=embed_pg)
-                        elif str(reaction) == '⏭':
-                            page = page_limit-1
+                    elif str(reaction) == '▶':
+                        if page < page_limit:
+                            page += 1
                             embed_pg, page_limit = book_page(
                                 arg, book, page, use_keywords)
                             await message.edit(embed=embed_pg)
+                    elif str(reaction) == '⏭':
+                        page = page_limit-1
+                        embed_pg, page_limit = book_page(
+                            arg, book, page, use_keywords)
+                        await message.edit(embed=embed_pg)
 
-                        await message.remove_reaction(reaction, user)
+                    await message.remove_reaction(reaction, user)
 
-                finally:
-                    try:
-                        await message.clear_reactions()
-                    except UnboundLocalError:
-                        pass
+            finally:
+                try:
+                    await message.clear_reactions()
+                except UnboundLocalError:
+                    pass
         else:
             ctx.command.reset_cooldown(ctx)
 
@@ -105,9 +101,6 @@ class BookSearch(Cog):
             return  # None
         msg = list(arg.lower())
 
-        with open("data/whitelist.txt", "r") as f:
-            whitelist = f.read().split("\n")
-
         reset_flag = False
         book, channel, reset_flag = check_channel(ctx.channel.id, reset_flag)
 
@@ -115,64 +108,63 @@ class BookSearch(Cog):
             ctx.command.reset_cooldown(ctx)
 
         if str(ctx.channel.id) in channel:
-            if all(elem in whitelist for elem in msg):  # if msg in whitelist
+            try:
+                await ctx.trigger_typing()
+                embed_pg, page_limit = book_page(
+                    arg, book, 0, use_keywords)
+
+                if re.search(
+                        "^quote not found!".lower(), embed_pg.description.lower()) is not None:
+                    ctx.command.reset_cooldown(ctx)
+
                 try:
-                    await ctx.trigger_typing()
-                    embed_pg, page_limit = book_page(
-                        arg, book, 0, use_keywords)
+                    message = await ctx.message.reply(
+                        embed=embed_pg, mention_author=False)
 
-                    if re.search(
-                            "^quote not found!".lower(), embed_pg.description.lower()) is not None:
-                        ctx.command.reset_cooldown(ctx)
+                except Exception:
+                    message = await ctx.message.channel.send(
+                        embed=embed_pg)
 
-                    try:
-                        message = await ctx.message.reply(
-                            embed=embed_pg, mention_author=False)
+                await message.add_reaction('⏮')
+                await message.add_reaction('◀')
+                await message.add_reaction('▶')
+                await message.add_reaction('⏭')
 
-                    except Exception:
-                        message = await ctx.message.channel.send(
-                            embed=embed_pg)
+                def check(reaction, user):
+                    return user == ctx.author and reaction.message.id == message.id
 
-                    await message.add_reaction('⏮')
-                    await message.add_reaction('◀')
-                    await message.add_reaction('▶')
-                    await message.add_reaction('⏭')
+                page = 0
+                reaction = None
+                while True:
+                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
-                    def check(reaction, user):
-                        return user == ctx.author and reaction.message.id == message.id
-
-                    page = 0
-                    reaction = None
-                    while True:
-                        reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
-
-                        if str(reaction) == '⏮':
-                            page = 0
+                    if str(reaction) == '⏮':
+                        page = 0
+                        embed_pg, page_limit = book_page(
+                            arg, book, page, use_keywords)
+                        await message.edit(embed=embed_pg)
+                    elif str(reaction) == '◀':
+                        if page > 0:
+                            page -= 1
                             embed_pg, page_limit = book_page(
                                 arg, book, page, use_keywords)
                             await message.edit(embed=embed_pg)
-                        elif str(reaction) == '◀':
-                            if page > 0:
-                                page -= 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, page, use_keywords)
-                                await message.edit(embed=embed_pg)
-                        elif str(reaction) == '▶':
-                            if page < page_limit:
-                                page += 1
-                                embed_pg, page_limit = book_page(
-                                    arg, book, page, use_keywords)
-                                await message.edit(embed=embed_pg)
-                        elif str(reaction) == '⏭':
-                            page = page_limit-1
+                    elif str(reaction) == '▶':
+                        if page < page_limit:
+                            page += 1
                             embed_pg, page_limit = book_page(
                                 arg, book, page, use_keywords)
                             await message.edit(embed=embed_pg)
+                    elif str(reaction) == '⏭':
+                        page = page_limit-1
+                        embed_pg, page_limit = book_page(
+                            arg, book, page, use_keywords)
+                        await message.edit(embed=embed_pg)
 
-                        await message.remove_reaction(reaction, user)
+                    await message.remove_reaction(reaction, user)
 
-                finally:
-                    await message.clear_reactions()
+            finally:
+                await message.clear_reactions()
         else:
             ctx.command.reset_cooldown(ctx)
 
