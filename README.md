@@ -20,11 +20,30 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 # Development
 
+## Python
+
 - Install Python >=3.8.5
 - Create a python virtual environment in which you will be installing all the dependencies and activate it before installing the dependencies.
-- Fork the repository and clone the fork in a directory and create a new branch for your development. Do not add new features to the `main` branch.
-- Install the dependencies using `pip install -r requirements_dev.txt`
+- Install the dependencies using `pip install -r requirements.txt`
+
+## Git
+
+### Forking & Cloning
+
+- Fork the repository and clone the fork in a directory using `git clone --recurse-submodules` since the repository contains a submodule which has all the data files.
+
+- Create a new branch for your development. Do not add new features to the `main` branch.
+
+### Updating the "data" sub-module
+
+- All the data files are stored in a separate Github Repo called [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) and you need to commit/update the sub-module when you make changes to the data/ files. Since a sub-module is also a git repository, you simply need to `cd data/` and `git add/commit` as you normally do.
+
+## Discord
+
 - Rename the `.env.ex` file to `.env` which should contain the `DISCORD_TOKEN` for your testing bot.
+
 - Create a testing bot from the [Discord Developer Portal](https://discord.com/developers/applications) and copy the bot token to the `.env` file.
+
 - Run the bot using `python main.py` in the root directory.
+
 - To add support for other fanfictions, check the `scripts/` directory to know how to add the necessary `data/` files.
