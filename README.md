@@ -28,15 +28,33 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 ## Git
 
-### Forking & Cloning
+- Create a new directory called `Quote Finder` in you system. You will be forking and cloning the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) & [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository.
 
-- Fork the repository and clone the fork in a directory using `git clone --recurse-submodules` since the repository contains a submodule which has all the data files.
+- [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) contains the source code for the bot.
+
+- [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) contains the data files and is added as a submodule to the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) repositories.
+
+### Forking & Cloning the Quote-Finder Repository
+
+- Fork the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) repository and clone the fork in the `Quote Finder` directory using `git clone --recurse-submodules <URL>` since the repository contains a submodule.
 
 - Create a new branch for your development. Do not add new features to the `main` branch.
 
-### Updating the "data" sub-module
+### Forking & Cloning the Quote-Finder-Data Repository
 
-- All the data files are stored in a separate Github Repo called [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) and you need to commit/update the sub-module when you make changes to the data/ files. Since a sub-module is also a git repository, you simply need to `cd data/` and `git add/commit` as you normally do.
+- Since all the data files are stored in a separate Github repository called [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data), you will need fork & clone it in the `Quote Finder` directory to add or updates data files.
+
+- Add or update any files you need to and then push to your fork. Then make a PR to the [Upstream](https://github.com/Bot-Devel/Quote-Finder-Data)
+
+### Updating the "data" submodule
+
+- You will need to pull the submodule once your changes are merged in the [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository.
+
+- In your `Quote-Finder` directory, you can simply `cd data/` and `git pull`, as you normally do for repositories since the submodule is also a git repository.
+
+- Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes.
+
+Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. You can change the `url` of the submodule to your fork during development.
 
 ## Discord
 
@@ -46,4 +64,4 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Run the bot using `python main.py` in the root directory.
 
-- To add support for other fanfictions, check the `scripts/` directory to know how to add the necessary `data/` files.
+- To add support for other fanfictions, check the `scripts/` directory to know how to add the necessary data files.

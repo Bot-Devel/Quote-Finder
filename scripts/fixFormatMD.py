@@ -9,6 +9,10 @@ parser.add_argument("-o", "--output", help="Output markdown txt file")
 args = parser.parse_args()
 
 
+def regex_sub(pattern, sub, book):
+    return re.sub(pattern, sub, book, flags=re.M)
+
+
 if args.input and args.output:
     with open(args.input, "r", errors='ignore') as file_input:
         md_book = file_input.read()
@@ -17,35 +21,37 @@ if args.input and args.output:
         print("Number of occurences of ###: ",
               len(re.findall(r'### ', md_book)))
 
-
         print("Removing *** from the file")
-        md_book_rstar = re.sub(r'\n+ *\* *\* *\* *\n+', r'\n\n',
-                               md_book, flags=re.M)
+        md_book_formatted = regex_sub(r'\n+ *\* *\* *\* *\n+', r'\n\n',
+                                      md_book)
 
         print("Removing \*\*\* from the file")
-        md_book_rstar1 = re.sub(r'\n+^\\\*\\\*\\\*$\n+', r'\n\n',
-                                md_book_rstar, flags=re.M)
+        md_book_formatted = regex_sub(r'\n+^\\\*\\\*\\\*$\n+', r'\n\n',
+                                      md_book_formatted)
 
         print("Removing \*\*\*\* from the file")
-        md_book_rstar2 = re.sub(r'\n+^\\\*\\\*\\\*\\\*$\n+', r'\n\n',
-                                md_book_rstar1, flags=re.M)
+        md_book_formatted = regex_sub(r'\n+^\\\*\\\*\\\*\\\*$\n+', r'\n\n',
+                                      md_book_formatted)
 
         print("Removing ### from the file")
-        md_book_rstar3 = re.sub(r'### ', r'',
-                                md_book_rstar2, flags=re.M)
+        md_book_formatted = regex_sub(r'### ', r'', md_book_formatted)
 
         print("Removing invalid continuation bytes from the file")
-        md_book_rstar4 = re.sub(r'^\s', r'',
-                                md_book_rstar3, flags=re.M)
+        md_book_formatted = regex_sub(r'^\s', r'',
+                                      md_book_formatted)
+
+        print("Removing thematic breaks the file")
+        md_book_formatted = regex_sub(r'^\* \* \*', r'',
+                                      md_book_formatted)
 
         print("Removing extra paragraphs and white spaces from the file")
         # \n+ is used to capture the whitespaces
-        md_book_rws = re.sub(r'(?:\n+(\*+ *))?\n+',
-                             r'\n\n', md_book_rstar4, flags=re.M)
+        md_book_formatted = regex_sub(r'(?:\n+(\*+ *))?\n+', r'\n\n',
+                                      md_book_formatted)
 
     with open(args.output, "w") as file_output:
         print(f"Writing to {args.output}")
-        file_output.write(md_book_rws)
+        file_output.write(md_book_formatted)
 else:
     parser.print_help()
     sys.exit(0)

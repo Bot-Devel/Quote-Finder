@@ -16,10 +16,12 @@ ebook-convert 'Harry Potter and the Prince of Slytherin-ffnet_11191235.epub' 'Ha
 ebook-convert 'Black Luminary-ffnet_12125300.epub' 'Black Luminary_md.txt' --txt-output-formatting markdown
 echo "Conversion using calibre completed"
 
-cd ..
+cd ../..
 
 echo "Cleaning the markdown files"
 python scripts/fixFormatMD.py -i "ebook processing/Downloaded/Harry Potter and the Prince of Slytherin_md.txt" -o "ebook processing/Processed/Harry Potter and the Prince of Slytherin_md.txt"
 python scripts/fixFormatMD.py -i "ebook processing/Downloaded/Black Luminary_md.txt" -o "ebook processing/Processed/Black Luminary_md.txt"
 
+# Copy the processed files to data/books/
+cp -r "ebook processing/Processed/." "data/books/"
 echo "Cron job completed"
