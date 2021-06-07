@@ -54,4 +54,8 @@ def get_book(book):
     elif book == 2:  # black luminary
         book_md = "data/books/Black Luminary_md.txt"
 
+    elif book == 3:  # AoC
+        book_md = "data/books/Harry Potter and the Ashes of Chaos_md.txt"
+
+
     return book_md

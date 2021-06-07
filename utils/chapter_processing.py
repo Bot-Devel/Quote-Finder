@@ -87,6 +87,14 @@ def get_chapter_head_tag(book, quote_found, book_lines):
             book_tag = ". VoD"  # till chapter 49
         else:
             book_tag = ". ML"  # after chapter 49
+            
+    elif book == 3:  # AoC
+        if quote_found < 316:  # prologue
+            book_tag = ". Prologue"  # Just the first chapter
+        elif quote_found < 9468:
+            book_tag = ". TFA"  # Book 1
+        else:
+            book_tag = ". SS"  # Book 2
 
     for i in range(quote_found, 0, -1):
         if book_tag in book_lines[i]:
@@ -112,5 +120,9 @@ def get_chapter_title_url(book, chapter_heading):
     elif book == 2:  # black luminary
         chapter_title, chapter_url = default_chapter_processing(
             chapter_heading, "https://www.fanfiction.net/s/12125300/")
+            
+    elif book == 3:  # AoC
+            chapter_title, chapter_url = default_chapter_processing(
+                chapter_heading, "https://www.fanfiction.net/s/13507192/")
 
     return chapter_title, chapter_url
