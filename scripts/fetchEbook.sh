@@ -23,5 +23,5 @@ python scripts/fixFormatMD.py -i "ebook processing/Downloaded/Harry Potter and t
 python scripts/fixFormatMD.py -i "ebook processing/Downloaded/Black Luminary_md.txt" -o "ebook processing/Processed/Black Luminary_md.txt"
 
 # Copy the processed files to data/books/
-cp -r "ebook processing/Processed/." "data/books/"
+# cp -r "ebook processing/Processed/." "data/books/"
 echo "Cron job completed"

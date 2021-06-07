@@ -21,9 +21,18 @@ if args.input and args.output:
         print("Number of occurences of ###: ",
               len(re.findall(r'### ', md_book)))
 
+        print("Removing # from the file")
+        md_book_formatted = regex_sub(r'^# ', r'', md_book)
+
+        print("Removing ## from the file")
+        md_book_formatted = regex_sub(r'^## ', r'', md_book_formatted)
+
+        print("Removing ### from the file")
+        md_book_formatted = regex_sub(r'^### ', r'', md_book_formatted)
+
         print("Removing *** from the file")
         md_book_formatted = regex_sub(r'\n+ *\* *\* *\* *\n+', r'\n\n',
-                                      md_book)
+                                      md_book_formatted)
 
         print("Removing \*\*\* from the file")
         md_book_formatted = regex_sub(r'\n+^\\\*\\\*\\\*$\n+', r'\n\n',
@@ -33,8 +42,8 @@ if args.input and args.output:
         md_book_formatted = regex_sub(r'\n+^\\\*\\\*\\\*\\\*$\n+', r'\n\n',
                                       md_book_formatted)
 
-        print("Removing ### from the file")
-        md_book_formatted = regex_sub(r'### ', r'', md_book_formatted)
+        print(r"Removing '^n\b' from the file")
+        md_book_formatted = regex_sub(r'^n\b', r'', md_book_formatted)
 
         print("Removing invalid continuation bytes from the file")
         md_book_formatted = regex_sub(r'^\s', r'',
@@ -47,6 +56,10 @@ if args.input and args.output:
         print("Removing extra paragraphs and white spaces from the file")
         # \n+ is used to capture the whitespaces
         md_book_formatted = regex_sub(r'(?:\n+(\*+ *))?\n+', r'\n\n',
+                                      md_book_formatted)
+
+        print("Removing space, tab or newline characters from the file")
+        md_book_formatted = regex_sub(r'^\s+', r'\n',
                                       md_book_formatted)
 
     with open(args.output, "w") as file_output:
