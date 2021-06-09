@@ -7,6 +7,7 @@ The bot currenly supports searching feature for the following fanfiction-
 
 - **Harry Potter and the Prince of Slytherin by The Sinister Man**
 - **Black Luminary by YakAge**
+- **Harry Potter and the Ashes of Chaos By ACI100**
 
 <br/>
 
@@ -52,13 +53,13 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - In your `Quote-Finder` directory, you can simply `cd data/` and `git pull`, as you normally do for repositories since the submodule is also a git repository.
 
-- Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes.
+- Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes. This is the recommended way.
 
-Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. You can change the `url` of the submodule to your fork during development.
+Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly update the files in your local `/data` directory.
 
 ## Discord
 
-- Rename the `.env.ex` file to `.env` which should contain the `DISCORD_TOKEN` for your testing bot.
+- Create a `.env` file which should contain the `DISCORD_TOKEN` for your testing bot as shown in the `.env.ex` file.
 
 - Create a testing bot from the [Discord Developer Portal](https://discord.com/developers/applications) and copy the bot token to the `.env` file.
 

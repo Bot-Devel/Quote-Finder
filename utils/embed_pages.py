@@ -2,7 +2,7 @@ import discord
 import re
 
 import utils.chapter_processing as chapter_processing
-from utils.finder import get_dict_index, quote_find, pos_dict
+from utils.finder import dict_index, quote_find, pos_dict
 
 
 def book_page(arg, book, page, use_keywords):
@@ -73,7 +73,7 @@ def index_page(page=0):
     the embed & limit
     """
 
-    des = get_dict_index()
+    des = dict_index()
     # Divide the index list into chunks so that there are 10 in each page
     res = list(divide_chunks(des, 10))
     limit = len(res)

@@ -57,5 +57,4 @@ def get_book(book):
     elif book == 3:  # AoC
         book_md = "data/books/Harry Potter and the Ashes of Chaos_md.txt"
 
-
     return book_md

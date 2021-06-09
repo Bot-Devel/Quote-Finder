@@ -27,12 +27,12 @@ def search_string(book_md, string_to_search, book, use_keywords):
 
     with open(book_md, 'r') as read_obj1:
         for line in read_obj1:
-            
+
             line_number += 1
             # remove markdown
             line1 = re.sub(r'\*', '', line, flags=re.M)
             line2 = re.sub(r'\\', '', line1, flags=re.M)
-        
+
             # For each line, check if line contains the string
             if re.search(raw_string, line2, re.IGNORECASE) is not None:
                 # if string found, append the line number
@@ -48,7 +48,7 @@ def search_string(book_md, string_to_search, book, use_keywords):
     return book_lines, line_number_index1, quote_found_ctr
 
 
-def search_dict(pos_json, string_to_search, page, use_keywords):
+def search_dict(data, string_to_search, page, use_keywords):
     """Search for the given string in the json file and return the title and description"""
 
     string_to_process = string_to_search.replace(
@@ -70,13 +70,12 @@ def search_dict(pos_json, string_to_search, page, use_keywords):
     title = []
     description = []
 
-    with open(pos_json, 'r') as read_obj1:
-        data = json.load(read_obj1)
-        for i in data['dictionary']:
-            if re.search(raw_string, i['title'], re.IGNORECASE) is not None:
-                title.append(i['title'])
-                description.append(i['description'])
-                quote_found_ctr = 1
+    for i in data['dictionary']:
+
+        if re.search(raw_string, i['title'], re.IGNORECASE):
+            title.append(i['title'])
+            description.append(i['description'])
+            quote_found_ctr = 1
 
     page_limit = len(title)
     if quote_found_ctr == 1:
