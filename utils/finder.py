@@ -1,4 +1,7 @@
 import csv
+from contextlib import closing
+import codecs
+import requests
 
 from utils.search import search_string, search_dict
 from utils.processing import get_book
@@ -83,30 +86,30 @@ def pos_dict(arg, page, use_keywords):
 
 
 def get_dictionary_data():
-    sheet1 = "data/dictionary/POS Dictionary - Sheet1.csv"
-    sheet2 = "data/dictionary/POS Dictionary - Sheet2.csv"
+
+    sheet1_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/export?gid=0&format=csv"
+    sheet2_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/export?gid=1&format=csv"
 
     data = {}
     data["dictionary"] = []
 
-    with open(sheet2) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=",")
-
-        dictionary_terms1 = []
-        for row in csv_reader:
-
+    dictionary_terms1 = []
+    with closing(requests.get(sheet2_url, stream=True)) as r:
+        reader = csv.reader(codecs.iterdecode(
+            r.iter_lines(), 'utf-8'), delimiter=',', quotechar='"')
+        for row in reader:
             dictionary_terms1.append(row)
 
-        dictionary_terms1.pop(0)
+    dictionary_terms1.pop(0)
 
-    with open(sheet1) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=",")
-
-        dictionary_terms2 = []
-        for row in csv_reader:
+    dictionary_terms2 = []
+    with closing(requests.get(sheet1_url, stream=True)) as r:
+        reader = csv.reader(codecs.iterdecode(
+            r.iter_lines(), 'utf-8'), delimiter=',', quotechar='"')
+        for row in reader:
             dictionary_terms2.append(row)
 
-        dictionary_terms2.pop(0)
+    dictionary_terms2.pop(0)
 
     for i in range(len(dictionary_terms1)):
         data["dictionary"].append({
