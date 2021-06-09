@@ -8,11 +8,11 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 # to use repl+uptime monitor
-from utils.bot_uptime import start_server
+# from utils.bot_uptime import start_server
+client = commands.Bot(command_prefix=['f', 'Q'], help_command=None)
 
-client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('DISCORD_CANARY_TOKEN')
 
 
 @client.event
@@ -35,31 +35,31 @@ async def bot_uptime():
 
 # Comment out this function during development to see the
 # traceback of all the errors
-@client.event
-async def on_command_error(ctx, error):
+# @client.event
+# async def on_command_error(ctx, error):
 
-    # if cooldown error
-    if isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
+#     # if cooldown error
+#     if isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
 
-        # Get the current timeout from the error message
-        timeout = (re.search(r"\d+\b", str(error))).group(0)
+#         # Get the current timeout from the error message
+#         timeout = (re.search(r"\d+\b", str(error))).group(0)
 
-        embed = discord.Embed(
-            description=str(error) +
-            f"\nThis message will self-destruct in {error.retry_after:.2f}s. \
-             You will be able to use the bot again when this message is deleted."
-        ).set_footer(text=ctx.message.author)
+#         embed = discord.Embed(
+#             description=str(error) +
+#             f"\nThis message will self-destruct in {error.retry_after:.2f}s. \
+#              You will be able to use the bot again when this message is deleted."
+#         ).set_footer(text=ctx.message.author)
 
-        message = await ctx.send(embed=embed)
+#         message = await ctx.send(embed=embed)
 
-        await asyncio.sleep(int(timeout))
-        await message.delete()
+#         await asyncio.sleep(int(timeout))
+#         await message.delete()
 
-    else:
-        print(error)
+#     else:
+#         print(error)
 
-bot_uptime.start()
-start_server()
+# bot_uptime.start()
+# start_server()
 client.load_extension("exts.cogs.book_search")
 client.load_extension("exts.cogs.dictionary_search")
 client.load_extension("exts.cogs.dictionary_index")
