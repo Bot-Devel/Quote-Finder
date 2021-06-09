@@ -24,7 +24,6 @@ class DictionarySearch(Cog):
         use_keywords = False
         if ctx.message.author == self.client.user:
             return  # None
-        msg = list(arg.lower())
 
         if str(ctx.channel.id) in pos_channel_whitelist:
             ctx.command.reset_cooldown(ctx)
@@ -83,11 +82,12 @@ class DictionarySearch(Cog):
                         await message.edit(embed=embed_pg)
 
                     await message.remove_reaction(reaction, user)
-                await message.clear_reactions()
 
-            except Exception:
-                pass
-
+            finally:
+                try:
+                    await message.clear_reactions()
+                except UnboundLocalError:
+                    pass
         else:
             ctx.command.reset_cooldown(ctx)
 
@@ -99,7 +99,6 @@ class DictionarySearch(Cog):
         use_keywords = True
         if ctx.message.author == self.client.user:
             return  # None
-        # msg = list(arg.lower())
 
         if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:
@@ -155,11 +154,12 @@ class DictionarySearch(Cog):
                         await message.edit(embed=embed_pg)
 
                     await message.remove_reaction(reaction, user)
-                await message.clear_reactions()
 
-            except Exception:
-                pass
-
+            finally:
+                try:
+                    await message.clear_reactions()
+                except UnboundLocalError:
+                    pass
         else:
             ctx.command.reset_cooldown(ctx)
 
