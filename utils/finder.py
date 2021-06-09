@@ -1,4 +1,3 @@
-# import json
 import csv
 
 from utils.search import search_string, search_dict
@@ -50,15 +49,14 @@ def quote_find(arg1, page_number, book, use_keywords):
     return chapter_heading[0], des, quote_found_ctr, len(line_number_index)
 
 
-def get_dict_index():
+def dict_index():
     """ Read the json file and append the title values to the index
     and return index
     """
-    # file = "data/dictionary/POS Dictionary.json"
-    data = get_dictionary()
+
+    data = get_dictionary_data()
     index = []
-    # with open(file, 'r') as read_obj1:
-    # data = json.load(read_obj1)
+
     for i in data['dictionary']:
         index.append(i['title'])
 
@@ -69,8 +67,9 @@ def pos_dict(arg, page, use_keywords):
     """ Call search_dict() and return title,
     description & quote_found_ctr
     """
-    # pos_json = "data/dictionary/POS Dictionary.json"
-    data = get_dictionary()
+
+    data = get_dictionary_data()
+
     title, description, quote_found_ctr, page_limit = search_dict(
         data, arg, page, use_keywords)
 
@@ -83,14 +82,14 @@ def pos_dict(arg, page, use_keywords):
     return title, description, quote_found_ctr, page_limit
 
 
-def get_dictionary():
+def get_dictionary_data():
     sheet1 = "data/dictionary/POS Dictionary - Sheet1.csv"
     sheet2 = "data/dictionary/POS Dictionary - Sheet2.csv"
 
     data = {}
     data["dictionary"] = []
-    # terms_count = 0
-    with open(sheet1) as csv_file:
+
+    with open(sheet2) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
 
         dictionary_terms1 = []
@@ -100,7 +99,7 @@ def get_dictionary():
 
         dictionary_terms1.pop(0)
 
-    with open(sheet2) as csv_file:
+    with open(sheet1) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
 
         dictionary_terms2 = []
@@ -116,7 +115,10 @@ def get_dictionary():
             "description": str(dictionary_terms1[i][1]),
         })
     for j in range(len(dictionary_terms2)):
-        i += 1  # In the prev loop, i=14 and we did i+1 during appending but we need it to be 15 for the next loop
+
+        # In the prev loop, i=14 and we did i+1 during appending
+        # but we need it to be 15 for the next loop
+        i += 1
         data["dictionary"].append({
             "title": str(i+1)+") "+str(dictionary_terms2[j][0]),
             "description": str(dictionary_terms2[j][1]),

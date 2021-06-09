@@ -22,10 +22,6 @@ A simple command-line script which takes the markdown txt file as the input, rem
 
 Run the script at the root directory of the repository.
 
-## excelToJson.py
-
-A script which converts the `data/dictionary/POS Dictionary.xlsx` file to `data/dictionary/POS Dictionary.json` file.
-
 ## crontab & timestamp.sh
 
 ### crontab
