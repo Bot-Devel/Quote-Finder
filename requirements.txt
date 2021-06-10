@@ -33,3 +33,4 @@ Werkzeug==2.0.1
 wheel==0.36.2
 yarl==1.6.3
 zipp==3.1.0
+portalocker==2.3.0
