@@ -1,10 +1,8 @@
-from utils.chapter_processing import get_chapter_head_tag
-from utils.processing import get_book
-from utils.search import search_string, search_dict
-import requests
-import codecs
-from contextlib import closing
 import csv
+
+from utils.search import search_string, search_dict
+from utils.processing import get_book
+from utils.chapter_processing import get_chapter_head_tag
 
 
 def quote_find(arg1, page_number, book, use_keywords):
@@ -85,47 +83,28 @@ def pos_dict(arg, page, use_keywords):
 
 
 def get_dictionary_data():
-
-    sheet1_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/export?gid=0&format=csv"
-    sheet2_url = "https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/export?gid=1143251734&format=csv"
-
-    sheet1_resp = requests.get(sheet1_url)
-    sheet2_resp = requests.get(sheet2_url)
-
-    sheet1_out = 'data/dictionary/POS Dictionary - Sheet1.csv'
-    sheet2_out = 'data/dictionary/POS Dictionary - Sheet2.csv'
-
-    with open(sheet1_out, 'w') as f:
-        writer = csv.writer(f)
-        for line in sheet1_resp.iter_lines():
-            writer.writerow(line.decode('utf-8').split(','))
-
-    with open(sheet2_out, 'w') as f:
-        writer = csv.writer(f)
-        for line in sheet2_resp.iter_lines():
-            writer.writerow(line.decode('utf-8').split(','))
+    sheet1 = "data/dictionary/POS Dictionary - Sheet1.csv"
+    sheet2 = "data/dictionary/POS Dictionary - Sheet2.csv"
 
     data = {}
     data["dictionary"] = []
 
-    with open(sheet2_out, "r") as csv_file:
+    with open(sheet2) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
 
         dictionary_terms1 = []
         for row in csv_reader:
-            if len(row[0]):
-                print("row", row)
-                dictionary_terms1.append(row)
+
+            dictionary_terms1.append(row)
 
         dictionary_terms1.pop(0)
 
-    with open(sheet1_out, "r") as csv_file:
+    with open(sheet1) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=",")
 
         dictionary_terms2 = []
         for row in csv_reader:
-            if len(row[0]):
-                dictionary_terms2.append(row)
+            dictionary_terms2.append(row)
 
         dictionary_terms2.pop(0)
 
