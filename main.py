@@ -1,7 +1,7 @@
 import os
 import re
 import asyncio
-import requests
+import aiohttp
 
 import discord
 from discord.ext import commands, tasks
@@ -28,9 +28,11 @@ async def bot_uptime():
     await client.wait_until_ready()
 
     while not client.is_closed():
+        async with aiohttp.ClientSession() as session:
+            async with session \
+                    .get("https://quote-finder-bot.roguedev1.repl.co/") as response:
 
-        requests.get("https://quote-finder-bot.roguedev1.repl.co/")
-        await asyncio.sleep(30)
+                await asyncio.sleep(20)
 
 
 # Comment out this function during development to see the
