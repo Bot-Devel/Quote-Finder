@@ -38,7 +38,7 @@ click = "^7.1.2"
 waitress = "^2.0.0"
 Flask = "^2.0.1"
 requests = "^2.25.1"
-
+portalocker = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 

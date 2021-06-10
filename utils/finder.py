@@ -1,4 +1,5 @@
 import csv
+import portalocker
 
 from utils.search import search_string, search_dict
 from utils.processing import get_book
@@ -89,39 +90,44 @@ def get_dictionary_data():
     data = {}
     data["dictionary"] = []
 
-    with open(sheet2) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=",")
+    with portalocker.Lock(sheet2):
+        with open(sheet2) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=",")
 
-        dictionary_terms1 = []
-        for row in csv_reader:
+            dictionary_terms1 = []
+            for row in csv_reader:
 
-            dictionary_terms1.append(row)
+                dictionary_terms1.append(row)
 
-        dictionary_terms1.pop(0)
+            dictionary_terms1.pop(0)
 
-    with open(sheet1) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=",")
+    with portalocker.Lock(sheet1):
+        with open(sheet1) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=",")
 
-        dictionary_terms2 = []
-        for row in csv_reader:
-            dictionary_terms2.append(row)
+            dictionary_terms2 = []
+            for row in csv_reader:
+                dictionary_terms2.append(row)
 
-        dictionary_terms2.pop(0)
+            dictionary_terms2.pop(0)
 
+    page_count = 0
     for i in range(len(dictionary_terms1)):
-        data["dictionary"].append({
-            # str(i+1) is used since initially i=0
-            "title": str(i+1)+") "+str(dictionary_terms1[i][0]),
-            "description": str(dictionary_terms1[i][1]),
-        })
+        page_count += 1
+        data["dictionary"].append(
+            {
+                "title": f"{str(page_count)}) {str(dictionary_terms1[i][0])}",
+                "description": str(dictionary_terms1[i][1]),
+            }
+        )
     for j in range(len(dictionary_terms2)):
 
-        # In the prev loop, i=14 and we did i+1 during appending
-        # but we need it to be 15 for the next loop
-        i += 1
-        data["dictionary"].append({
-            "title": str(i+1)+") "+str(dictionary_terms2[j][0]),
-            "description": str(dictionary_terms2[j][1]),
-        })
+        page_count += 1
+        data["dictionary"].append(
+            {
+                "title": f"{str(page_count)}) {str(dictionary_terms2[j][0])}",
+                "description": str(dictionary_terms2[j][1]),
+            }
+        )
 
     return data
