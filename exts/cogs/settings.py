@@ -19,7 +19,7 @@ class Settings(Cog):
 
     @command()
     async def update(self, ctx):
-        """ Command to fetch latest dictionary files from google 
+        """ Command to fetch latest dictionary files from google
             sheets
         """
 

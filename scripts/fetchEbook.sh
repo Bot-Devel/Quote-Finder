@@ -1,9 +1,16 @@
 #!/bin/bash
 echo "Cron job started"
 
-# Use the respective environment manager
-source ~/miniconda3/etc/profile.d/conda.sh
-conda activate fanfic
+# Activate your virtualenv using
+# your respective environment manager
+if which pyenv > /dev/null; then
+    eval "$(pyenv init --path)" # this only sets up the path stuff
+    eval "$(pyenv init -)"      # this makes pyenv work in the shell
+fi
+if which pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init - zsh)"
+fi
+pyenv activate fanfic-download
 
 cd 'ebook processing/Downloaded'
 echo "Updating the epub files using fanficfare"
