@@ -3,12 +3,13 @@ import re
 import asyncio
 from itertools import cycle
 
+
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 # to use repl+uptime monitor
-# from utils.bot_uptime import start_server
+from utils.bot_uptime import start_server
 client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
 
 load_dotenv()
@@ -19,7 +20,7 @@ with open("data/status_quotes.txt", "r") as file:
 
 
 @tasks.loop(seconds=1)
-async def bot_uptime():
+async def bot_status():
 
     await client.wait_until_ready()
 
@@ -56,8 +57,8 @@ async def on_command_error(ctx, error):
     else:
         print(error)
 
-bot_uptime.start()
-# start_server()
+bot_status.start()
+start_server()
 client.load_extension("exts.cogs.book_search")
 client.load_extension("exts.cogs.dictionary_search")
 client.load_extension("exts.cogs.dictionary_index")

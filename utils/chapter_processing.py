@@ -66,7 +66,7 @@ def default_chapter_processing(chapter_heading, base_url: str):
     return chapter_heading, url
 
 
-def get_chapter_head_tag(book, quote_found, book_lines):
+def get_chapter_head_tag(book_number, quote_found, book_lines):
     """ Process the chapter heading and book tag and 
         return book_tag, chapter_heading
     """
@@ -74,21 +74,21 @@ def get_chapter_head_tag(book, quote_found, book_lines):
     chapter_heading = []  # line containg the chapter heading
 
     # book_tag is the identifier used to recognize the book name i.e. HP, HB, VoD, ML
-    if book == 1:  # prince of slytherin
+    if book_number == 1:  # prince of slytherin
         if quote_found < 51316:  # after line number 51316, "HB" starts
             book_tag = ". HP&"  # till chapter 138
         else:
             book_tag = ". HB&"  # from chapter 139
 
-    elif book == 2:  # black luminary
+    elif book_number == 2:  # black luminary
         if quote_found < 8989:  # after line number 8989, "VoD" starts
             book_tag = ". HD"  # till chapter 25
         elif quote_found < 22301:
             book_tag = ". VoD"  # till chapter 49
         else:
             book_tag = ". ML"  # after chapter 49
-            
-    elif book == 3:  # AoC
+
+    elif book_number == 3:  # AoC
         if quote_found < 316:  # prologue
             book_tag = ". Prologue"  # Just the first chapter
         elif quote_found < 9468:
@@ -108,21 +108,21 @@ def get_chapter_head_tag(book, quote_found, book_lines):
     return book_tag, chapter_heading
 
 
-def get_chapter_title_url(book, chapter_heading):
+def get_chapter_title_url(book_number, chapter_heading):
     """ Process the chapter title and url and
         return chapter_title, chapter_url
     """
 
-    if book == 1:  # prince of slytherin
+    if book_number == 1:  # prince of slytherin
         chapter_title, chapter_url = pos_chapter_processing(
             chapter_heading)
 
-    elif book == 2:  # black luminary
+    elif book_number == 2:  # black luminary
         chapter_title, chapter_url = default_chapter_processing(
             chapter_heading, "https://www.fanfiction.net/s/12125300/")
-            
-    elif book == 3:  # AoC
-            chapter_title, chapter_url = default_chapter_processing(
-                chapter_heading, "https://www.fanfiction.net/s/13507192/")
+
+    elif book_number == 3:  # AoC
+        chapter_title, chapter_url = default_chapter_processing(
+            chapter_heading, "https://www.fanfiction.net/s/13507192/")
 
     return chapter_title, chapter_url
