@@ -5,69 +5,6 @@ import utils.chapter_processing as chapter_processing
 from utils.finder import dict_index, quote_find, pos_dict
 
 
-def book_page(arg, book, page, use_keywords):
-    """ Call quote_find() and process the chapter_title & chapter_url
-        and return the embed and page_limit
-    """
-
-    chapter_heading, chapter_description, quote_found_ctr, page_limit = quote_find(
-        arg, page, book, use_keywords)
-
-    if quote_found_ctr == 1:
-
-        chapter_title, chapter_url = chapter_processing.get_chapter_title_url(
-            book, chapter_heading)
-
-    page_footer = "Page "+str(page+1)+' of '+str(page_limit)
-
-    # underline search phrase
-    if use_keywords is True:
-        for i in arg.split():
-
-            match = re.findall(i, chapter_description, re.IGNORECASE)
-
-            for word in match:
-                chapter_description = re.sub(
-                    fr"\b{word}\b", f"__{word}__", chapter_description)
-
-    elif use_keywords is False:
-        arg1 = r"\b\*{0,}?"
-        arg1 += r"\*{0,}? ".join(arg.split())
-        arg1 += r"\*{0,}?\b"
-
-        match = re.findall(
-            arg1.strip(), chapter_description, re.IGNORECASE)
-
-        for word in match:
-            chapter_description = re.sub(
-                fr"\b{word}\b", f"__{word}__", chapter_description)
-
-    # To fix the embed.description: Must be 2048 or fewer in length error
-    if len(list(chapter_description)) > 2048:
-        chapter_description = chapter_description[:2020] + "..."
-    else:
-        pass
-
-    if quote_found_ctr == 1:
-        embed1 = discord.Embed(title=''.join(chapter_title),
-                               url=chapter_url,
-                               description=chapter_description,
-                               colour=discord.Colour(0x272b28))
-        embed1.set_footer(text=page_footer)
-
-    elif quote_found_ctr == 0:
-        embed1 = discord.Embed(
-            description="Quote not found!",
-            colour=discord.Colour(0x272b28))
-
-    elif quote_found_ctr == 2:
-        embed1 = discord.Embed(
-            description="No more quotes found!",
-            colour=discord.Colour(0x272b28))
-
-    return embed1, page_limit
-
-
 def index_page(page=0):
     """ Call get_dict_index() & divide_chunks() and return
     the embed & limit
@@ -79,15 +16,15 @@ def index_page(page=0):
     limit = len(res)
 
     if page < limit:
-        embed1 = discord.Embed(title='POS Dictionary Index',
-                               url="https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing",
-                               description='\n'.join(res[page]),
-                               colour=discord.Colour(0x272b28))
+        embed_msg = discord.Embed(title='POS Dictionary Index',
+                                  url="https://docs.google.com/spreadsheets/d/1k-GXwnmJGLtp_IUNCkPI-B4IT5u-qDBEEH7KwJPLBuA/edit?usp=sharing",
+                                  description='\n'.join(res[page]),
+                                  colour=discord.Colour(0x272b28))
     else:
-        embed1 = discord.Embed(
+        embed_msg = discord.Embed(
             description="No more index data!",
             colour=discord.Colour(0x272b28))
-    return embed1, limit
+    return embed_msg, limit
 
 
 def dict_page(arg, page, use_keywords):
@@ -107,12 +44,12 @@ def dict_page(arg, page, use_keywords):
         chapter_url = ""
         description = "No more dictionary data found!"
 
-    embed1 = discord.Embed(title=''.join(title),
-                           url=chapter_url,
-                           description=description,
-                           colour=discord.Colour(0x272b28))
+    embed_msg = discord.Embed(title=''.join(title),
+                              url=chapter_url,
+                              description=description,
+                              colour=discord.Colour(0x272b28))
 
-    return embed1, page_limit
+    return embed_msg, page_limit
 
 
 def divide_chunks(list1, n):

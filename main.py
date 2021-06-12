@@ -8,7 +8,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
 # to use repl+uptime monitor
-from utils.bot_uptime import start_server
+# from utils.bot_uptime import start_server
 client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
 
 load_dotenv()
@@ -57,7 +57,7 @@ async def on_command_error(ctx, error):
         print(error)
 
 bot_uptime.start()
-start_server()
+# start_server()
 client.load_extension("exts.cogs.book_search")
 client.load_extension("exts.cogs.dictionary_search")
 client.load_extension("exts.cogs.dictionary_index")
