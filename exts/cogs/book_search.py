@@ -19,14 +19,12 @@ class BookSearch(Cog):
         """
         use_keywords = False
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
-        reset_flag = False
-        book_number, channel, reset_flag = check_channel(
-            ctx.channel.id, reset_flag)
+        book_number, channel = check_channel(ctx)
 
-        if reset_flag:
-            ctx.command.reset_cooldown(ctx)
+        if book_number is None:
+            return
 
         if str(ctx.channel.id) in channel:
             try:
@@ -97,8 +95,6 @@ class BookSearch(Cog):
                     await message.clear_reactions()
                 except UnboundLocalError:
                     pass
-        else:
-            ctx.command.reset_cooldown(ctx)
 
     @cooldown(1, 15, BucketType.user)
     @command(name='fk', pass_context=True)
@@ -109,14 +105,12 @@ class BookSearch(Cog):
         """
         use_keywords = True
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
-        reset_flag = False
-        book_number, channel, reset_flag = check_channel(
-            ctx.channel.id, reset_flag)
+        book_number, channel = check_channel(ctx)
 
-        if reset_flag:
-            ctx.command.reset_cooldown(ctx)
+        if book_number is None:
+            return
 
         if str(ctx.channel.id) in channel:
             try:
@@ -187,9 +181,6 @@ class BookSearch(Cog):
 
                 except UnboundLocalError:
                     pass
-
-        else:
-            ctx.command.reset_cooldown(ctx)
 
 
 def setup(client):

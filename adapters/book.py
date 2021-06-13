@@ -129,7 +129,7 @@ class Book:
             self.page_limit = 1
 
     def search_query(self):
-        """Search the given string in the file and get all the lines of the
+        """Search the query string in the file and get all the lines of the
         book as a list and list of all the line numbers containing the string
         """
 

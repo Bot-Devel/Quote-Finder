@@ -19,7 +19,7 @@ class Help(Cog):
         """
 
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         await ctx.trigger_typing()
         embed = discord.Embed(title='Help Menu',

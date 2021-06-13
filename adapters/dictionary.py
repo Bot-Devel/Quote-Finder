@@ -90,7 +90,7 @@ class Dictionary:
 
     def search_dictionary(self, query):
         """
-        Search for the given string in the csv
+        Search for the query string in the csv
         file and retgeturn the title & description
         """
 

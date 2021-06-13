@@ -21,7 +21,7 @@ class DictionaryIndex(Cog):
         the dictionary CSV files
         """
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:

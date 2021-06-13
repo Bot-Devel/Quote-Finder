@@ -22,7 +22,7 @@ class DictionarySearch(Cog):
         """ Command to search and find the dictionary term """
         use_keywords = False
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         if str(ctx.channel.id) in pos_channel_whitelist:
             ctx.command.reset_cooldown(ctx)
@@ -104,7 +104,7 @@ class DictionarySearch(Cog):
         """ Command to search and find the dictionary term using keywords """
         use_keywords = True
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:
