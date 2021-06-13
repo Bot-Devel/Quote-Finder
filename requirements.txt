@@ -3,7 +3,7 @@ async-timeout==3.0.1
 attrs==21.2.0
 autopep8==1.5.7
 chardet==4.0.0
-discord.py==1.7.2
+discord.py==1.7.3
 flake8==3.9.2
 idna==3.2
 mccabe==0.6.1

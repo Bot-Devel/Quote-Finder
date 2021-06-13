@@ -1,5 +1,4 @@
 import re
-
 from discord import Embed, Colour
 
 from utils.processing import get_dictionary_data, divide_chunks

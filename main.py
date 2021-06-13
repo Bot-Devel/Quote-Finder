@@ -25,8 +25,10 @@ async def bot_status():
     await client.wait_until_ready()
 
     await client.change_presence(
-        activity=discord.Game(
-            name=next(quotes))
+        activity=discord.Activity(
+            type=discord.ActivityType.listening,
+            name=(next(quotes)).strip()
+        )
     )
 
     await asyncio.sleep(15)
