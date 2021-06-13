@@ -19,8 +19,7 @@ class DictionarySearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='d', pass_context=True)
     async def search_dictionary(self, ctx, *, arg):
-        """ Command to search and find the dictionary phrase from a json file
-        """
+        """ Command to search and find the dictionary term """
         use_keywords = False
         if ctx.message.author == self.client.user:
             return  # None
@@ -35,7 +34,9 @@ class DictionarySearch(Cog):
                 dictionary.dictionary_page(arg)
 
                 if re.search(
-                        "^dictionary term not found!", dictionary.embed_msg.description.lower()) is not None:
+                        "^dictionary term not found!",
+                        dictionary.embed_msg.description.lower()):
+
                     ctx.command.reset_cooldown(ctx)
 
                 try:
@@ -52,12 +53,14 @@ class DictionarySearch(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and reaction.message.id == message.id
+                    return user == ctx.author and \
+                        reaction.message.id == message.id
 
                 page = 0
                 reaction = None
                 while True:
-                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+                    reaction, user = await self.client.wait_for(
+                        'reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
                         page = 0
@@ -98,8 +101,7 @@ class DictionarySearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='dk', pass_context=True)
     async def search_dictionary_keys(self, ctx, *, arg):
-        """ Command to search and find the dictionary phrase from a json file
-        """
+        """ Command to search and find the dictionary term using keywords """
         use_keywords = True
         if ctx.message.author == self.client.user:
             return  # None
@@ -111,7 +113,9 @@ class DictionarySearch(Cog):
                 dictionary.dictionary_page(arg)
 
                 if re.search(
-                        "^dictionary term not found!", dictionary.embed_msg.description.lower()) is not None:
+                        "^dictionary term not found!",
+                        dictionary.embed_msg.description.lower()):
+
                     ctx.command.reset_cooldown(ctx)
 
                 try:
@@ -128,12 +132,14 @@ class DictionarySearch(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and reaction.message.id == message.id
+                    return user == ctx.author and \
+                        reaction.message.id == message.id
 
                 page = 0
                 reaction = None
                 while True:
-                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+                    reaction, user = await self.client.wait_for(
+                        'reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
                         page = 0

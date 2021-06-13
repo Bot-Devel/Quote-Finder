@@ -21,6 +21,10 @@ with open("data/status_quotes.txt", "r") as file:
 
 @tasks.loop(seconds=1)
 async def bot_status():
+    """
+    An activity status which cycles through the
+    HP quotes every 15s
+    """
 
     await client.wait_until_ready()
 
@@ -38,6 +42,7 @@ async def bot_status():
 # traceback of all the errors
 @client.event
 async def on_command_error(ctx, error):
+    """ Catches command errors like cooldown, timeout etc """
 
     # if cooldown error
     if isinstance(error, discord.ext.commands.errors.CommandOnCooldown):

@@ -14,7 +14,8 @@ class BookSearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='f', pass_context=True)
     async def search_book(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+        """
+        Command to search and find the quote from the txt file
         """
         use_keywords = False
         if ctx.message.author == self.client.user:
@@ -102,7 +103,9 @@ class BookSearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='fk', pass_context=True)
     async def search_book_keys(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+        """
+        Command to search and find the quote from the txt file
+        using keywords
         """
         use_keywords = True
         if ctx.message.author == self.client.user:

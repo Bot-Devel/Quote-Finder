@@ -16,7 +16,7 @@ class Book:
 
     def book_page(self):
         """ Call quote_find() and process the chapter_title & chapter_url
-            and return the embed and page_limit
+            and get the embed and page_limit
         """
         self.quote_processing()
 
@@ -29,7 +29,7 @@ class Book:
             self.page_footer = "Page " + \
                 str(self.page_number+1)+' of '+str(self.page_limit)
 
-        # underline search phrase
+            # underline search phrase
             if self.use_keywords is True:
                 for i in self.query.split():
 
@@ -111,23 +111,22 @@ class Book:
 
             self.quote_found_ctr = 1
 
+            self.book_tag, self.chapter_heading = get_chapter_head_tag(
+                self.book, self.quote_found, self.book_lines)
+
+            self.chapter_description = self.first_line+"\n\n" + \
+                self.next_line  # final output string
+            self.page_limit = len(self.line_number_index)
+
+            # chapter_heading[0] contains the chapter heading of the
+            # chapter where the quote was found
+            self.chapter_heading = self.chapter_heading[0]
+
         except IndexError:
             # if the page number crosses the len(line_number_index)
             self.quote_found_ctr = 2
             self.quote_found = None
             self.page_limit = 1
-            return
-
-        self.book_tag, self.chapter_heading = get_chapter_head_tag(
-            self.book, self.quote_found, self.book_lines)
-
-        self.chapter_description = self.first_line+"\n\n" + \
-            self.next_line  # final output string
-        self.page_limit = len(self.line_number_index)
-
-        # chapter_heading[0] contains the chapter heading of the
-        # chapter where the quote was found
-        self.chapter_heading = self.chapter_heading[0]
 
     def search_query(self):
         """Search the given string in the file and get all the lines of the
@@ -178,7 +177,9 @@ class Book:
         self.line_number_index = [x - 1 for x in self.line_number_index1]
 
     def get_match_pattern(self):
-        """Process the given string and return the regex as a raw string"""
+        """
+        Process the query string and get the regex match pattern
+        """
         string_processing = []
         self.match_pattern = f"\b{self.query[0]}\W"
 

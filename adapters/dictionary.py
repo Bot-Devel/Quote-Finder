@@ -10,11 +10,15 @@ class Dictionary:
         self.use_keywords = use_keywords
 
     def dictionary_page(self, query):
+        """
+        Process the query using get_dictionary_data() & search_dictionary()
+        and get the embed_msg & page_limit
+        """
 
         self.data = get_dictionary_data()
         self.search_dictionary(query)
 
-        # # embed.description: Must be 2048 or fewer in length
+        # embed.description: Must be 2048 or fewer in length
         if len(list(self.description)) > 2048:
             self.description = self.description[:2020] + "..."
 
@@ -41,7 +45,8 @@ class Dictionary:
                 colour=Colour(0x272b28))
 
     def dictionary_index_page(self):
-        """ Call get_dict_index() & divide_chunks() and return
+        """
+        Call get_dictionary_index() & divide_chunks() and get
         the embed & page_limit
         """
 
@@ -73,8 +78,8 @@ class Dictionary:
                 colour=Colour(0x272b28))
 
     def get_dictionary_index(self):
-        """ Read the json file and append the title values to the index
-        and return index
+        """ Read the csv file and append the title values to the dict_index
+            and get the dict_index
         """
 
         self.data = get_dictionary_data()
@@ -84,8 +89,9 @@ class Dictionary:
             self.dict_index.append(i['title'])
 
     def search_dictionary(self, query):
-        """Search for the given string in the json
-           file and return the title and description
+        """
+        Search for the given string in the csv
+        file and retgeturn the title & description
         """
 
         string_to_process = query.replace(
@@ -122,16 +128,14 @@ class Dictionary:
 
             except IndexError:
                 self.term_found_ctr = 2
-                self.quote_found = None
                 self.page_limit = 1
-                return
 
         if self.term_found_ctr == 0:
             self.title.append('')
             self.description.append('Dictionary term not found!')
 
     def get_match_pattern(self, query):
-        """Process the given string and return the regex as a raw string"""
+        """ Process the query string and get the regex match pattern """
         string_processing = []
 
         string_processing = [r'\b']

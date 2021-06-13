@@ -16,7 +16,9 @@ class DictionaryIndex(Cog):
 
     @command(name='index', pass_context=True)
     async def show_dict_index(self, ctx):
-        """ Command to show the dictionary index by parsing the dictionary excel sheet
+        """
+        Command to show the dictionary index by parsing
+        the dictionary CSV files
         """
         if ctx.message.author == self.client.user:
             return  # None
@@ -41,12 +43,14 @@ class DictionaryIndex(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and reaction.message.id == message.id
+                    return user == ctx.author and \
+                        reaction.message.id == message.id
 
                 page = 0
                 reaction = None
                 while True:
-                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+                    reaction, user = await self.client.wait_for(
+                        'reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
                         page = 0

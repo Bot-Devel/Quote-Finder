@@ -3,13 +3,13 @@ import portalocker
 
 
 def divide_chunks(index_list, n_chunks):
-    """ Divide the index list into 'n' equal chunks
-    """
+    """Divide the index list into 'n' equal chunks"""
     for i in range(0, len(index_list), n_chunks):
         yield index_list[i:i + n_chunks]
 
 
 def get_book(book_number):
+    """ Get the file path of the book from the book_number """
 
     if book_number == 1:  # prince of slytherin
         book_md = "data/books/Harry Potter and the Prince of Slytherin_md.txt"
@@ -24,6 +24,11 @@ def get_book(book_number):
 
 
 def get_dictionary_data():
+    """
+    Get the dictionary data by reading the CSV file and
+    returning the data
+    """
+
     sheet1 = "data/dictionary/POS Dictionary - Sheet1.csv"
     sheet2 = "data/dictionary/POS Dictionary - Sheet2.csv"
 
