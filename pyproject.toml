@@ -6,25 +6,20 @@ authors = [""]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-"discord.py" = "^1.7.3"
 aiohttp = "^3.7.4"
 async-timeout = "^3.0.1"
 attrs = "^21.2.0"
-autopep8 = "^1.5.7"
 chardet = "^4.0.0"
-flake8 = "^3.9.2"
-idna = "^3.2"
-mccabe = "^0.6.1"
+"discord.py" = "^1.7.3"
+Flask = "^2.0.1"
+idna = "^2.10"
 multidict = "^5.1.0"
 portalocker = "^2.3.0"
-pycodestyle = "^2.7.0"
-pyflakes = "^2.3.1"
-toml = "^0.10.2"
+python-dotenv = "^0.17.1"
 typing-extensions = "^3.10.0"
 yarl = "^1.6.3"
-python-dotenv = "^0.17.1"
 waitress = "^2.0.0"
-Flask = "^2.0.1"
+
 
 [tool.poetry.dev-dependencies]
 
