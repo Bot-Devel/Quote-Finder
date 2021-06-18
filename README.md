@@ -25,7 +25,7 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Install Python >=3.8.5
 - Create a python virtual environment in which you will be installing all the dependencies and activate it before installing the dependencies.
-- Install the dependencies using `pip install -r requirements.txt`
+- Install the dependencies using `pip install -r requirements_dev.txt`
 
 ## Git
 
