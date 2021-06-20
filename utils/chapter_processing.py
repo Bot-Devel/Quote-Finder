@@ -2,7 +2,10 @@ import re
 
 
 def pos_chapter_processing(chapter_heading):
-    """Process the chapter heading and return chapter title and chapter url """
+    """
+    Process the chapter heading and return
+    chapter title & chapter url
+    """
 
     # list containing the chapter header split each character
     chapter_heading_list = list(chapter_heading)
@@ -13,12 +16,12 @@ def pos_chapter_processing(chapter_heading):
             # incrementing 4 will put the index at the chapter number
             # of the chapter i.e. "1" in  139. HB&TRG 1: In Which Plans Are Made
             loc_of_and += 4
-            break  # Sometimes there are two or more &s, without break, the index is overwritten
+            # Sometimes there are two or more &s,
+            # without break, the index is overwritten
+            break
 
     chapter_template = ['C', 'h', 'a', 'p', 't', 'e', 'r', ' ']
-    book_name = []  # Contains the global chapter number and the book name i.e. 134. HP&DEM |
-    # complete chapter title of the chapter where the quote was found
-    # i.e 134. HP&DEM | Chapter 50: The King of Rats
+    book_name = []
     chapter_title = []
 
     try:
@@ -44,7 +47,7 @@ def pos_chapter_processing(chapter_heading):
 
     # converting the list to string
     chapter_number = ''.join(chapter_number)
-    # removed non-numeric characters like *
+    # removing non-numeric characters like *
     chapter_number = filter(str.isdigit, chapter_number)
     # converting the filter object to string
     chapter_number = ''.join(chapter_number)
@@ -56,7 +59,10 @@ def pos_chapter_processing(chapter_heading):
 
 
 def default_chapter_processing(chapter_heading, base_url: str):
-    """Process the default chapter heading and return chapter title and chapter url """
+    """
+    Process the default chapter heading and return
+    chapter title & chapter url
+    """
 
     # get the chapter number from the heading
     chapter_number = (re.search(r'^\d+\.', chapter_heading)).group(0)
@@ -66,29 +72,31 @@ def default_chapter_processing(chapter_heading, base_url: str):
     return chapter_heading, url
 
 
-def get_chapter_head_tag(book, quote_found, book_lines):
-    """ Process the chapter heading and book tag and 
-        return book_tag, chapter_heading
+def get_chapter_head_tag(book_number, quote_found, book_lines):
+    """
+    Process the chapter heading and book tag and
+    return book_tag & chapter_heading
     """
 
     chapter_heading = []  # line containg the chapter heading
 
-    # book_tag is the identifier used to recognize the book name i.e. HP, HB, VoD, ML
-    if book == 1:  # prince of slytherin
+    # book_tag is the identifier used to recognize the book name
+    # i.e. HP, HB, VoD, ML
+    if book_number == 1:  # prince of slytherin
         if quote_found < 51316:  # after line number 51316, "HB" starts
             book_tag = ". HP&"  # till chapter 138
         else:
             book_tag = ". HB&"  # from chapter 139
 
-    elif book == 2:  # black luminary
+    elif book_number == 2:  # black luminary
         if quote_found < 8989:  # after line number 8989, "VoD" starts
             book_tag = ". HD"  # till chapter 25
         elif quote_found < 22301:
             book_tag = ". VoD"  # till chapter 49
         else:
             book_tag = ". ML"  # after chapter 49
-            
-    elif book == 3:  # AoC
+
+    elif book_number == 3:  # AoC
         if quote_found < 316:  # prologue
             book_tag = ". Prologue"  # Just the first chapter
         elif quote_found < 9468:
@@ -98,7 +106,8 @@ def get_chapter_head_tag(book, quote_found, book_lines):
 
     for i in range(quote_found, 0, -1):
         if book_tag in book_lines[i]:
-            # append all the lines containing the chapter heading from the last chapter to the chapter containing the quote_found
+            # append all the lines containing the chapter heading from
+            # the last chapter to the chapter containing the quote_found
             chapter_heading.append(book_lines[i])
 
     if len(chapter_heading) == 0:
@@ -108,21 +117,22 @@ def get_chapter_head_tag(book, quote_found, book_lines):
     return book_tag, chapter_heading
 
 
-def get_chapter_title_url(book, chapter_heading):
-    """ Process the chapter title and url and
-        return chapter_title, chapter_url
+def get_chapter_title_url(book_number, chapter_heading):
+    """
+    Process the chapter title and url and
+    return chapter_title, chapter_url
     """
 
-    if book == 1:  # prince of slytherin
+    if book_number == 1:  # prince of slytherin
         chapter_title, chapter_url = pos_chapter_processing(
             chapter_heading)
 
-    elif book == 2:  # black luminary
+    elif book_number == 2:  # black luminary
         chapter_title, chapter_url = default_chapter_processing(
             chapter_heading, "https://www.fanfiction.net/s/12125300/")
-            
-    elif book == 3:  # AoC
-            chapter_title, chapter_url = default_chapter_processing(
-                chapter_heading, "https://www.fanfiction.net/s/13507192/")
+
+    elif book_number == 3:  # AoC
+        chapter_title, chapter_url = default_chapter_processing(
+            chapter_heading, "https://www.fanfiction.net/s/13507192/")
 
     return chapter_title, chapter_url

@@ -2,7 +2,7 @@ import re
 from discord.ext.commands import command, Cog, cooldown
 from discord.ext.commands.cooldowns import BucketType
 
-from utils.embed_pages import dict_page
+from adapters.dictionary import Dictionary
 from exts import config
 
 pos_channel_cooldown = [x.strip() for x in (config.get(
@@ -19,11 +19,10 @@ class DictionarySearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='d', pass_context=True)
     async def search_dictionary(self, ctx, *, arg):
-        """ Command to search and find the dictionary phrase from a json file
-        """
+        """ Command to search and find the dictionary term """
         use_keywords = False
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         if str(ctx.channel.id) in pos_channel_whitelist:
             ctx.command.reset_cooldown(ctx)
@@ -31,19 +30,22 @@ class DictionarySearch(Cog):
         if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:
                 await ctx.trigger_typing()
-                embed_pg, page_limit = dict_page(arg, 0, use_keywords)
+                dictionary = Dictionary(0, use_keywords)
+                dictionary.dictionary_page(arg)
 
                 if re.search(
-                        "^dictionary data not found!", embed_pg.description.lower()) is not None:
+                        "^dictionary term not found!",
+                        dictionary.embed_msg.description.lower()):
+
                     ctx.command.reset_cooldown(ctx)
 
                 try:
                     message = await ctx.message.reply(
-                        embed=embed_pg, mention_author=False)
+                        embed=dictionary.embed_msg, mention_author=False)
 
                 except Exception:
                     message = await ctx.message.channel.send(
-                        embed=embed_pg)
+                        embed=dictionary.embed_msg)
 
                 await message.add_reaction('⏮')
                 await message.add_reaction('◀')
@@ -51,35 +53,40 @@ class DictionarySearch(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and reaction.message.id == message.id
+                    return user == ctx.author and \
+                        reaction.message.id == message.id
 
                 page = 0
                 reaction = None
                 while True:
-                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+                    reaction, user = await self.client.wait_for(
+                        'reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
                         page = 0
-                        embed_pg, page_limit = dict_page(
-                            arg, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        dictionary = Dictionary(page, use_keywords)
+                        dictionary.dictionary_page(arg)
+                        await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '◀':
                         if page > 0:
                             page -= 1
-                            embed_pg, page_limit = dict_page(
-                                arg, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            dictionary = Dictionary(page, use_keywords)
+                            dictionary.dictionary_page(arg)
+                            await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '▶':
-                        if page < page_limit:
+                        if page < dictionary.page_limit:
                             page += 1
-                            embed_pg, page_limit = dict_page(
-                                arg, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            dictionary = Dictionary(page, use_keywords)
+                            dictionary.dictionary_page(arg)
+                            await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '⏭':
-                        page = page_limit-1
-                        embed_pg, page_limit = dict_page(
-                            arg, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        page = dictionary.page_limit-1
+                        dictionary = Dictionary(page, use_keywords)
+                        dictionary.dictionary_page(arg)
+                        await message.edit(embed=dictionary.embed_msg)
 
                     await message.remove_reaction(reaction, user)
 
@@ -94,28 +101,30 @@ class DictionarySearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='dk', pass_context=True)
     async def search_dictionary_keys(self, ctx, *, arg):
-        """ Command to search and find the dictionary phrase from a json file
-        """
+        """ Command to search and find the dictionary term using keywords """
         use_keywords = True
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
         if str(ctx.channel.id) in pos_channel_cooldown+pos_channel_whitelist:
             try:
                 await ctx.trigger_typing()
-                embed_pg, page_limit = dict_page(arg, 0, use_keywords)
+                dictionary = Dictionary(0, use_keywords)
+                dictionary.dictionary_page(arg)
 
                 if re.search(
-                        "^dictionary data not found!", embed_pg.description.lower()) is not None:
+                        "^dictionary term not found!",
+                        dictionary.embed_msg.description.lower()):
+
                     ctx.command.reset_cooldown(ctx)
 
                 try:
                     message = await ctx.message.reply(
-                        embed=embed_pg, mention_author=False)
+                        embed=dictionary.embed_msg, mention_author=False)
 
                 except Exception:
                     message = await ctx.message.channel.send(
-                        embed=embed_pg)
+                        embed=dictionary.embed_msg)
 
                 await message.add_reaction('⏮')
                 await message.add_reaction('◀')
@@ -123,35 +132,40 @@ class DictionarySearch(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and reaction.message.id == message.id
+                    return user == ctx.author and \
+                        reaction.message.id == message.id
 
                 page = 0
                 reaction = None
                 while True:
-                    reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
+                    reaction, user = await self.client.wait_for(
+                        'reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
                         page = 0
-                        embed_pg, page_limit = dict_page(
-                            arg, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        dictionary = Dictionary(page, use_keywords)
+                        dictionary.dictionary_page(arg)
+                        await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '◀':
                         if page > 0:
                             page -= 1
-                            embed_pg, page_limit = dict_page(
-                                arg, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            dictionary = Dictionary(page, use_keywords)
+                            dictionary.dictionary_page(arg)
+                            await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '▶':
-                        if page < page_limit:
+                        if page < dictionary.page_limit:
                             page += 1
-                            embed_pg, page_limit = dict_page(
-                                arg, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            dictionary = Dictionary(page, use_keywords)
+                            dictionary.dictionary_page(arg)
+                            await message.edit(embed=dictionary.embed_msg)
+
                     elif str(reaction) == '⏭':
-                        page = page_limit-1
-                        embed_pg, page_limit = dict_page(
-                            arg,  page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        page = dictionary.page_limit-1
+                        dictionary = Dictionary(page, use_keywords)
+                        dictionary.dictionary_page(arg)
+                        await message.edit(embed=dictionary.embed_msg)
 
                     await message.remove_reaction(reaction, user)
 

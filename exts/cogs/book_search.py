@@ -3,7 +3,7 @@ import re
 from discord.ext.commands import command, Cog, cooldown
 from discord.ext.commands.cooldowns import BucketType
 
-from utils.embed_pages import book_page
+from adapters.book import Book
 from exts.utils.channels import check_channel
 
 
@@ -14,36 +14,37 @@ class BookSearch(Cog):
     @cooldown(1, 15, BucketType.user)
     @command(name='f', pass_context=True)
     async def search_book(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+        """
+        Command to search and find the quote from the txt file
         """
         use_keywords = False
         if ctx.message.author == self.client.user:
-            return  # None
+            return
 
-        reset_flag = False
-        book, channel, reset_flag = check_channel(ctx.channel.id, reset_flag)
+        book_number, channel = check_channel(ctx)
 
-        if reset_flag:
-            ctx.command.reset_cooldown(ctx)
+        if book_number is None:
+            return
 
         if str(ctx.channel.id) in channel:
             try:
                 await ctx.trigger_typing()
-                embed_pg, page_limit = book_page(
-                    arg, book, 0, use_keywords)
+
+                book = Book(arg, book_number, 0, use_keywords)
+                book.book_page()
 
                 if re.search(
                     "^quote not found!".lower(),
-                        embed_pg.description.lower()) is not None:
+                        book.embed_msg.description.lower()) is not None:
                     ctx.command.reset_cooldown(ctx)
 
                 try:
                     message = await ctx.message.reply(
-                        embed=embed_pg, mention_author=False)
+                        embed=book.embed_msg, mention_author=False)
 
                 except Exception:
                     message = await ctx.message.channel.send(
-                        embed=embed_pg)
+                        embed=book.embed_msg)
 
                 await message.add_reaction('⏮')
                 await message.add_reaction('◀')
@@ -60,26 +61,32 @@ class BookSearch(Cog):
 
                     if str(reaction) == '⏮':
                         page = 0
-                        embed_pg, page_limit = book_page(
-                            arg, book, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        book = Book(arg, book_number, page, use_keywords)
+                        book.book_page()
+                        await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '◀':
                         if page > 0:
+
                             page -= 1
-                            embed_pg, page_limit = book_page(
-                                arg, book, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            book = Book(arg, book_number, page, use_keywords)
+                            book.book_page()
+                            await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '▶':
-                        if page < page_limit:
+                        if page < book.page_limit:
+
                             page += 1
-                            embed_pg, page_limit = book_page(
-                                arg, book, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            book = Book(arg, book_number, page, use_keywords)
+                            book.book_page()
+                            await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '⏭':
-                        page = page_limit-1
-                        embed_pg, page_limit = book_page(
-                            arg, book, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+
+                        page = book.page_limit-1
+                        book = Book(arg, book_number, page, use_keywords)
+                        book.book_page()
+                        await message.edit(embed=book.embed_msg)
 
                     await message.remove_reaction(reaction, user)
 
@@ -88,42 +95,40 @@ class BookSearch(Cog):
                     await message.clear_reactions()
                 except UnboundLocalError:
                     pass
-        else:
-            ctx.command.reset_cooldown(ctx)
 
     @cooldown(1, 15, BucketType.user)
     @command(name='fk', pass_context=True)
     async def search_book_keys(self, ctx, *, arg):
-        """ Command to search and find the quote from the txt file using regex
+        """
+        Command to search and find the quote from the txt file
+        using keywords
         """
         use_keywords = True
         if ctx.message.author == self.client.user:
-            return  # None
-        msg = list(arg.lower())
+            return
 
-        reset_flag = False
-        book, channel, reset_flag = check_channel(ctx.channel.id, reset_flag)
+        book_number, channel = check_channel(ctx)
 
-        if reset_flag:
-            ctx.command.reset_cooldown(ctx)
+        if book_number is None:
+            return
 
         if str(ctx.channel.id) in channel:
             try:
                 await ctx.trigger_typing()
-                embed_pg, page_limit = book_page(
-                    arg, book, 0, use_keywords)
+                book = Book(arg, book_number, 0, use_keywords)
+                book.book_page()
 
                 if re.search(
-                        "^quote not found!".lower(), embed_pg.description.lower()) is not None:
+                        "^quote not found!".lower(), book.embed_msg.description.lower()) is not None:
                     ctx.command.reset_cooldown(ctx)
 
                 try:
                     message = await ctx.message.reply(
-                        embed=embed_pg, mention_author=False)
+                        embed=book.embed_msg, mention_author=False)
 
                 except Exception:
                     message = await ctx.message.channel.send(
-                        embed=embed_pg)
+                        embed=book.embed_msg)
 
                 await message.add_reaction('⏮')
                 await message.add_reaction('◀')
@@ -139,34 +144,43 @@ class BookSearch(Cog):
                     reaction, user = await self.client.wait_for('reaction_add', timeout=30.0, check=check)
 
                     if str(reaction) == '⏮':
+
                         page = 0
-                        embed_pg, page_limit = book_page(
-                            arg, book, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+                        book = Book(arg, book_number, page, use_keywords)
+                        book.book_page()
+                        await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '◀':
                         if page > 0:
+
                             page -= 1
-                            embed_pg, page_limit = book_page(
-                                arg, book, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            book = Book(arg, book_number, page, use_keywords)
+                            book.book_page()
+                            await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '▶':
-                        if page < page_limit:
+                        if page < book.page_limit:
+
                             page += 1
-                            embed_pg, page_limit = book_page(
-                                arg, book, page, use_keywords)
-                            await message.edit(embed=embed_pg)
+                            book = Book(arg, book_number, page, use_keywords)
+                            book.book_page()
+                            await message.edit(embed=book.embed_msg)
+
                     elif str(reaction) == '⏭':
-                        page = page_limit-1
-                        embed_pg, page_limit = book_page(
-                            arg, book, page, use_keywords)
-                        await message.edit(embed=embed_pg)
+
+                        page = book.page_limit-1
+                        book = Book(arg, book_number, page, use_keywords)
+                        book.book_page()
+                        await message.edit(embed=book.embed_msg)
 
                     await message.remove_reaction(reaction, user)
 
             finally:
-                await message.clear_reactions()
-        else:
-            ctx.command.reset_cooldown(ctx)
+                try:
+                    await message.clear_reactions()
+
+                except UnboundLocalError:
+                    pass
 
 
 def setup(client):

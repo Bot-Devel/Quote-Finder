@@ -25,7 +25,7 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Install Python >=3.8.5
 - Create a python virtual environment in which you will be installing all the dependencies and activate it before installing the dependencies.
-- Install the dependencies using `pip install -r requirements.txt`
+- Install the dependencies using `pip install -r requirements_dev.txt`
 
 ## Git
 
@@ -55,7 +55,7 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes. This is the recommended way.
 
-Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly update the files in your local `/data` directory.
+Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly copy the files to your local `/data` directory.
 
 ## Discord
 
