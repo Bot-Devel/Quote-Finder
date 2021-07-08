@@ -43,8 +43,7 @@ class DictionaryIndex(Cog):
                 await message.add_reaction('⏭')
 
                 def check(reaction, user):
-                    return user == ctx.author and \
-                        reaction.message.id == message.id
+                    return user.id == ctx.author.id
 
                 page = 0
                 reaction = None

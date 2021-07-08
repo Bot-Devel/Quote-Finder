@@ -20,6 +20,9 @@ def get_book(book_number):
     elif book_number == 3:  # AoC
         book_md = "data/books/Harry Potter and the Ashes of Chaos_md.txt"
 
+    elif book_number == 4:  # PoDK
+        book_md = "data/books/Prince of the Dark Kingdom_md.txt"
+
     return book_md
 
 

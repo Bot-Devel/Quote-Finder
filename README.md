@@ -15,7 +15,13 @@ The bot's command prefix is `q` <br/>
 
 # Bot Usage
 
-Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help menu.<br/>The quote is not case-sensitive so either uppercase, lowercase or combination of both can be used to search for the quote.<br/>The following is an example on how the bot works in realtime-
+The bot has the following commands:
+
+- qf: To search a quote
+- qfk: To search a quote using keywords
+- qhelp: To show the help command
+
+<br/>The following is an example on how the bot works in realtime-
 
 ![](https://raw.githubusercontent.com/arzkar/Quote-Finder-Bot/main/images/bot_output.gif)
 
@@ -55,7 +61,7 @@ Use `qf [quote]` to search quotes in the book and use `qhelp` to view the help m
 
 - Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes. This is the recommended way.
 
-Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly copy the files to your local `/data` directory.
+Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly copy the files to your local `/data` directory (recommended).
 
 ## Discord
 

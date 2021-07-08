@@ -18,6 +18,9 @@ bl_channel_whitelist = [x.strip() for x in (config.get(
 aoc_channel_whitelist = [x.strip() for x in (config.get(
     'whitelist channels', 'aoc_channel')).split(",")]
 
+podk_channel_whitelist = [x.strip() for x in (config.get(
+    'whitelist channels', 'podk_channel')).split(",")]
+
 
 def check_channel(ctx):
 
@@ -33,6 +36,10 @@ def check_channel(ctx):
         book = 3
         channel = aoc_channel_cooldown+aoc_channel_whitelist
 
+    elif str(ctx.channel.id) in podk_channel_whitelist:
+        book = 4
+        channel = podk_channel_whitelist
+
     else:
         book = None
         channel = None
@@ -40,7 +47,8 @@ def check_channel(ctx):
 
     # reset cooldown if whitelist channel
     if str(ctx.channel.id) in pos_channel_whitelist + \
-            bl_channel_whitelist + aoc_channel_whitelist:
+            bl_channel_whitelist + aoc_channel_whitelist +\
+            podk_channel_whitelist:
 
         ctx.command.reset_cooldown(ctx)
 
