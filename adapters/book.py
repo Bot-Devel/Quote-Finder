@@ -93,7 +93,7 @@ class Book:
 
         try:
             if self.quote_found_ctr == 0:  # if no string found in the file
-                self.page_limit = len(self.line_number_index)
+                return
 
             self.first_line = self.book_lines[
                 self.line_number_index[self.page_number]].rstrip()

@@ -80,8 +80,7 @@ def get_chapter_head_tag(book_number, quote_found, book_lines):
 
     chapter_heading = []  # line containg the chapter heading
 
-    # book_tag is the identifier used to recognize the book name
-    # i.e. HP, HB, VoD, ML
+    # book_tag is used to match the chapter title using regex
     if book_number == 1:  # prince of slytherin
         if quote_found < 51316:  # after line number 51316, "HB" starts
             book_tag = ". HP&"  # till chapter 138
@@ -104,8 +103,11 @@ def get_chapter_head_tag(book_number, quote_found, book_lines):
         else:
             book_tag = ". SS"  # Book 2
 
+    elif book_number == 4:  # PoDK
+        book_tag = r"(\d+\. Book|\d+\. HP Book|\d+\. Chapter)"
+
     for i in range(quote_found, 0, -1):
-        if book_tag in book_lines[i]:
+        if re.search(book_tag, book_lines[i], re.I):
             # append all the lines containing the chapter heading from
             # the last chapter to the chapter containing the quote_found
             chapter_heading.append(book_lines[i])
@@ -134,5 +136,10 @@ def get_chapter_title_url(book_number, chapter_heading):
     elif book_number == 3:  # AoC
         chapter_title, chapter_url = default_chapter_processing(
             chapter_heading, "https://www.fanfiction.net/s/13507192/")
+
+    elif book_number == 4:  # PoDK
+        chapter_title, chapter_url = default_chapter_processing(
+            chapter_heading, "https://www.fanfiction.net/s/3766574/")
+        # return chapter_heading, "https://www.fanfiction.net/s/3766574/"
 
     return chapter_title, chapter_url
