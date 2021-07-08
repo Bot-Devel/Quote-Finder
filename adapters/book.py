@@ -150,17 +150,22 @@ class Book:
         elif self.use_keywords is False:
             self.get_match_pattern()
 
+        # exceptions
+        self.match_pattern = self.match_pattern.replace(r'!', r'\!')
+        self.match_pattern = self.match_pattern.replace(r'?', r'\?')
+        self.match_pattern = self.match_pattern.replace(r'\?=', r'?=')
+
         with open(self.book_md, 'r') as read_obj1:
             for line in read_obj1:
 
                 line_number += 1
 
-                # removing markdown
-                line_sub1 = re.sub(r'\*', '', line, flags=re.M)
-                line_sub2 = re.sub(r'\\', '', line_sub1, flags=re.M)
+                # fixing markdown
+                line = line.replace(r'\*', '')
+                line = line.replace(r'\\', '')
 
                 # For each line, check if line contains the string
-                if re.search(self.match_pattern, line_sub2, re.IGNORECASE):
+                if re.search(self.match_pattern, line, re.IGNORECASE):
                     # if string found, append the line number
                     self.line_number_index1.append(line_number)
 
@@ -183,29 +188,21 @@ class Book:
         string_processing = []
         self.match_pattern = f"\b{self.query[0]}\W"
 
-        if self.query[1] == "\"":
+        if self.query[0] == '"':
             # string[1] because 1st two elements are \ & " respectively
-            string_processing = [r'^[\"]+']
-
-            # pop the 1st two elements out since they are \ & " respectively
-            self.query = self.query[2:]
+            string_processing = ['']
             string_processing.append(self.query.lower())
-
+            # string_processing.append(r"\W")
             self.match_pattern = ''.join(map(str, string_processing))
 
-        elif self.query[0] == "\'":
+        elif self.query[0] == "'":
             # string[0] because 1st element is '
-
-            string_processing = [r'^[\']+']
-
-            # pop the 1st elements out since its '
-            self.query = self.query[1:]
+            string_processing = ['']
             string_processing.append(self.query.lower())
-
+            # string_processing.append(r"\W")
             self.match_pattern = ''.join(map(str, string_processing))
 
         else:
-
             string_processing = [r'\b']
             string_processing.append(self.query.lower())
             string_processing.append(r"\W")
