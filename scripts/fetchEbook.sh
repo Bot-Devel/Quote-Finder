@@ -10,7 +10,7 @@ fi
 if which pyenv-virtualenv-init > /dev/null; then
     eval "$(pyenv virtualenv-init - zsh)"
 fi
-pyenv activate fanfic-download
+pyenv activate ff-yt-dl
 
 cd 'ebook processing/Downloaded'
 echo "Updating the epub files using fanficfare"

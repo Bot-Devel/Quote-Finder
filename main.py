@@ -10,7 +10,9 @@ from dotenv import load_dotenv
 
 # to use repl+uptime monitor
 from utils.bot_uptime import start_server
-client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
+# client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
+client = commands.AutoShardedBot(shard_count=5, command_prefix=[
+                                 'q', 'Q'], help_command=None)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
