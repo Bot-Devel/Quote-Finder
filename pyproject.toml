@@ -1,28 +1,22 @@
-[tool.poetry]
-name = "Quote-Finder"
+[project]
+name = "quote-finder"
 version = "0.1.0"
-description = ""
-authors = [""]
-
-[tool.poetry.dependencies]
-python = "^3.8"
-aiohttp = "^3.7.4"
-async-timeout = "^3.0.1"
-attrs = "^21.2.0"
-chardet = "^4.0.0"
-"discord.py" = "^1.7.3"
-Flask = "^2.0.1"
-idna = "^2.10"
-multidict = "^5.1.0"
-portalocker = "^2.3.0"
-python-dotenv = "^0.17.1"
-typing-extensions = "^3.10.0"
-yarl = "^1.6.3"
-waitress = "^2.0.0"
-
-
-[tool.poetry.dev-dependencies]
-
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.4",
+    "asyncpg>=0.31.0",
+    "beautifulsoup4>=4.15.0",
+    "discord-py>=2.7.1",
+    "ebooklib>=0.20",
+    "fastembed>=0.8.0",
+    "greenlet>=3.5.2",
+    "loguru>=0.7.3",
+    "lxml>=6.1.1",
+    "python-dotenv>=1.2.2",
+    "qdrant-client>=1.18.0",
+    "rapidfuzz>=3.14.5",
+    "requests>=2.34.2",
+    "sqlalchemy>=2.0.51",
+]

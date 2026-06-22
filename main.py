@@ -1,76 +1,102 @@
 import os
-import re
+import sys
 import asyncio
-from itertools import cycle
-
+from concurrent.futures import ThreadPoolExecutor
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
+from loguru import logger
 
-# to use repl+uptime monitor
-# from utils.bot_uptime import start_server
-# client = commands.Bot(command_prefix=['q', 'Q'], help_command=None)
-client = commands.AutoShardedBot(shard_count=5, command_prefix=[
-                                 'q', 'Q'], help_command=None)
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from ingestion.embedding import LocalFastEmbedProvider, AsyncEmbeddingProvider
+from ingestion.vector import QdrantStore
+from adapters.fichub import FicHub
+
+# Load environment variables
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv("DISCORD_CANARY_TOKEN") or os.getenv("DISCORD_TOKEN")
 
-with open("data/status_quotes.txt", "r") as file:
-    quotes = cycle(file.readlines())
+# Setup logging
+logger.add("quote-finder.log", rotation="10 MB", retention="5 days", level="INFO")
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    if DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("sslmode=require", "ssl=require")
 
-@tasks.loop(seconds=1)
-async def bot_status():
-    """
-    An activity status which cycles through the
-    HP quotes every 15s
-    """
+QDRANT_URL = os.getenv("QDRANT_URL")
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
-    await client.wait_until_ready()
-
-    await client.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.listening,
-            name=(next(quotes)).strip()
+class QuoteFinderBot(commands.Bot):
+    def __init__(self):
+        # Intents allow the bot to read message content for prefix commands (!quote)
+        intents = discord.Intents.default()
+        intents.message_content = True
+        
+        super().__init__(
+            command_prefix="!", 
+            intents=intents,
+            help_command=commands.DefaultHelpCommand()
         )
-    )
+        
+        self.engine = None
+        self.session_maker = None
+        self.vector_store = None
+        self.embedding_provider = None
+        self.fichub_adapter = None
+        self.executor = ThreadPoolExecutor(max_workers=1)
 
-    await asyncio.sleep(15)
+    async def setup_hook(self):
+        print("Initializing services...")
+        # Database setup
+        if DATABASE_URL:
+            self.engine = create_async_engine(DATABASE_URL, echo=False)
+            self.session_maker = async_sessionmaker(self.engine, expire_on_commit=False)
+        
+        # Qdrant setup
+        if QDRANT_URL:
+            self.vector_store = QdrantStore(url=QDRANT_URL, api_key=QDRANT_API_KEY)
+            
+        # Embedding setup (loads model, might take a moment)
+        sync_provider = LocalFastEmbedProvider()
+        self.embedding_provider = AsyncEmbeddingProvider(sync_provider, self.executor)
+        
+        # FicHub adapter
+        self.fichub_adapter = FicHub()
 
+        # Load the cogs
+        await self.load_extension("cogs.search")
+        await self.load_extension("cogs.admin")
+        print("Loaded cogs.")
 
-# Comment out this function during development to see the
-# traceback of all the errors
-@client.event
-async def on_command_error(ctx, error):
-    """ Catches command errors like cooldown, timeout etc """
+    async def close(self):
+        if self.engine:
+            await self.engine.dispose()
+        self.executor.shutdown(wait=True)
+        await super().close()
 
-    # if cooldown error
-    if isinstance(error, discord.ext.commands.errors.CommandOnCooldown):
+    async def on_ready(self):
+        print("=" * 40)
+        print("✅ Quote Finder Bot is Online!")
+        print(f"🤖 Logged in as: {self.user} (ID: {self.user.id})")
+        print(f"🌍 Connected to {len(self.guilds)} guild(s):")
+        for guild in self.guilds:
+            print(f"   - {guild.name} (ID: {guild.id}) - {guild.member_count} members")
+        print(f"⚡ Gateway Latency: {round(self.latency * 1000)}ms")
+        print("=" * 40)
 
-        # Get the current timeout from the error message
-        timeout = (re.search(r"\d+\b", str(error))).group(0)
+def main():
+    if not TOKEN or TOKEN == "<your-bot-token>":
+        print("Error: DISCORD_CANARY_TOKEN or DISCORD_TOKEN is missing or not set properly in the .env file.")
+        return
 
-        embed = discord.Embed(
-            description=str(error) +
-            f"\nThis message will self-destruct in {error.retry_after:.2f}s. \
-             You will be able to use the bot again when this message is deleted."
-        ).set_footer(text=ctx.message.author)
+    bot = QuoteFinderBot()
+    bot.run(TOKEN)
 
-        message = await ctx.send(embed=embed)
-
-        await asyncio.sleep(int(timeout))
-        await message.delete()
-
-    else:
-        print(error)
-
-bot_status.start()
-# start_server()
-client.load_extension("exts.cogs.book_search")
-client.load_extension("exts.cogs.dictionary_search")
-client.load_extension("exts.cogs.dictionary_index")
-client.load_extension("exts.cogs.help")
-client.load_extension("exts.cogs.settings")
-client.run(TOKEN)
+if __name__ == "__main__":
+    main()
