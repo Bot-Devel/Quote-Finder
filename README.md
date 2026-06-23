@@ -10,7 +10,28 @@ The project runs natively using a two-process architecture powered by `systemd`:
 
 Both processes communicate and prevent concurrent operations using atomic Postgres job locks (`SELECT ... FOR UPDATE SKIP LOCKED`).
 
+## Ingestion Pipeline
+
+The bot safely imports and processes massive fanfictions using a sophisticated background pipeline:
+1. **Source & Validation**: Fetches the latest EPUB format from FicHub. The EPUB is strictly validated and parsed to extract chapter titles and raw paragraph text, while explicitly ignoring structural HTML wrapper bloat.
+2. **Chunking**: Paragraphs are assembled into contiguous, overlapping text chunks (e.g., 200 words, 50-word overlap). This ensures semantic meaning and narrative context aren't lost at paragraph boundaries.
+3. **Vectorization**: Uses local embedding models (e.g., `BAAI/bge-small-en-v1.5`) running asynchronously on the host machine to generate dense vector representations of each chunk.
+4. **Storage Integration**:
+   - **Neon Postgres**: Stores raw textual data, chapters, and normalized paragraph text.
+   - **Qdrant Cloud**: Stores the dense chunk vectors for semantic similarity search.
+5. **Differential Updates**: When tracking ongoing fics, the nightly maintenance job calculates chapter-level hashes. It performs a "Delta Refresh" by identifying and re-vectorizing *only* the chapters that were modified or added, saving massive amounts of compute.
+
+## Retrieval Pipeline
+
+When a user searches for a quote, the bot seamlessly routes queries through specialized retrieval flows:
+1. **Exact Search (`!qfe`)**: Executes a fast SQL `LIKE` query against normalized text in Postgres to find exact, verbatim matches.
+2. **Fuzzy Search (`!qff`)**: Uses Postgres Trigram indices (`pg_trgm`) to rapidly filter a candidate pool, then applies Python's `rapidfuzz` to rank candidates based on partial ratio string similarity.
+3. **Semantic Search (`!qfs`)**: Encodes the user's query into a vector and performs a fast k-NN search via Qdrant to find chunks with high Cosine Similarity, ideal for finding scenes based on vague descriptions.
+4. **Context Assembly**: Once matching paragraphs or chunks are identified, the system automatically fetches adjacent paragraphs from Postgres to present seamless, flowing context in the UI.
+5. **Presentation**: Results are rendered using interactive pagination Views, complete with hit highlighting and direct markdown hyperlinks to the exact FanFiction.net chapter.
+
 ## Commands
+
 
 **Public Search:**
 - `!qfe <query>`: Exact substring matching
