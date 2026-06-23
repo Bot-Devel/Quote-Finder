@@ -1,0 +1,23 @@
+[Unit]
+Description=Quote Finder Nightly Maintenance
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=arbaaz
+Group=arbaaz
+
+WorkingDirectory=/Users/arbaaz/Projects/Personal/Projects/Langs/Python/Bots/Discord Bots/Quote Finder/Quote-Finder
+EnvironmentFile=/Users/arbaaz/Projects/Personal/Projects/Langs/Python/Bots/Discord Bots/Quote Finder/Quote-Finder/.env
+
+ExecStart=/Users/arbaaz/Projects/Personal/Projects/Langs/Python/Bots/Discord Bots/Quote Finder/Quote-Finder/.venv/bin/python -m maintenance_main
+
+Environment=PYTHONUNBUFFERED=1
+Environment=HF_HOME=/Users/arbaaz/.cache/huggingface
+Environment=OMP_NUM_THREADS=4
+Environment=OPENBLAS_NUM_THREADS=4
+Environment=MKL_NUM_THREADS=4
+
+NoNewPrivileges=true
+PrivateTmp=true

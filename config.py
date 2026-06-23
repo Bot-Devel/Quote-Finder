@@ -7,6 +7,8 @@ load_dotenv()
 
 HOME_DIR = Path.home()
 
+ROOT_USER_ID = int(os.getenv("QUOTE_FINDER_ROOT_USER_ID") or os.getenv("ROOT_USER_ID") or "0")
+
 # --- Ingestion & Provider Settings ---
 INGESTION_TEMP_DIR = os.getenv("INGESTION_TEMP_DIR", str(HOME_DIR / "quote-finder" / "tmp"))
 EMBEDDING_CACHE_DIR = os.getenv("EMBEDDING_CACHE_DIR", str(HOME_DIR / "quote-finder" / "models"))

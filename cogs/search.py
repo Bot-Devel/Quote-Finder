@@ -138,8 +138,8 @@ class SearchCog(commands.Cog):
     async def qff(self, ctx, *, query: str):
         await self._handle_search(query, "fuzzy", ctx=ctx)
 
-    @commands.command(name="qf", help="Shows search command usage")
-    async def qf_help(self, ctx, *, query: Optional[str] = None):
+    @commands.group(name="qf", invoke_without_command=True, help="Shows search command usage")
+    async def qf_base(self, ctx, *, query: Optional[str] = None):
         msg = (
             "⚠️ **The `!qf` command has been split!** Please use one of the following:\n"
             "`!qfe <query>` - Exact Search\n"

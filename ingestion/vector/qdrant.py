@@ -70,6 +70,25 @@ class QdrantStore(VectorStore):
             )
         )
 
+    async def delete_chapters(self, version_id: str, chapter_numbers: list[int]) -> None:
+        if not chapter_numbers:
+            return
+        await self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(
+                        key="version_id",
+                        match=MatchValue(value=version_id)
+                    ),
+                    FieldCondition(
+                        key="chapter_number",
+                        match=models.MatchAny(any=chapter_numbers)
+                    )
+                ]
+            )
+        )
+
     async def delete_fic(self, fic_id: str) -> None:
         await self.client.delete(
             collection_name=self.collection_name,

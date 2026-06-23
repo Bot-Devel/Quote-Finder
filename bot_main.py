@@ -1,23 +1,20 @@
 import os
-import sys
-import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from loguru import logger
-
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from ingestion.embedding import LocalFastEmbedProvider, AsyncEmbeddingProvider
-from search.reranker import LocalFastEmbedReranker, AsyncRerankerProvider
-from ingestion.vector import QdrantStore
 from adapters.fichub import FicHub
+from ingestion.embedding import AsyncEmbeddingProvider, LocalFastEmbedProvider
+from ingestion.vector import QdrantStore
+from search.reranker import AsyncRerankerProvider, LocalFastEmbedReranker
 
 # Load environment variables
 load_dotenv()
-TOKEN = os.getenv("DISCORD_CANARY_TOKEN") or os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Setup logging
 logger.add("quote-finder.log", rotation="10 MB", retention="5 days", level="INFO")
@@ -33,18 +30,19 @@ if DATABASE_URL:
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
+
 class QuoteFinderBot(commands.Bot):
     def __init__(self):
         # Intents allow the bot to read message content for prefix commands (!quote)
         intents = discord.Intents.default()
         intents.message_content = True
-        
+
         super().__init__(
-            command_prefix="!", 
+            command_prefix="!",
             intents=intents,
-            help_command=commands.DefaultHelpCommand()
+            help_command=commands.DefaultHelpCommand(),
         )
-        
+
         self.engine = None
         self.session_maker = None
         self.vector_store = None
@@ -59,27 +57,28 @@ class QuoteFinderBot(commands.Bot):
         if DATABASE_URL:
             self.engine = create_async_engine(DATABASE_URL, echo=False)
             self.session_maker = async_sessionmaker(self.engine, expire_on_commit=False)
-        
+
         # Qdrant setup
         if QDRANT_URL:
             self.vector_store = QdrantStore(url=QDRANT_URL, api_key=QDRANT_API_KEY)
-            
+
         # Embedding setup (loads model, might take a moment)
         sync_provider = LocalFastEmbedProvider()
         self.embedding_provider = AsyncEmbeddingProvider(sync_provider, self.executor)
-        
+
         # Reranker setup
         import config
+
         if config.SEMANTIC_RERANK_ENABLED:
             print("Loading cross-encoder reranker model...")
             sync_reranker = LocalFastEmbedReranker()
             self.reranker_provider = AsyncRerankerProvider(sync_reranker, self.executor)
-            
+
         print("Warming up models...")
         await self.embedding_provider.embed_query("warmup")
         if self.reranker_provider:
             await self.reranker_provider.rerank("warmup", ["warmup"])
-        
+
         # FicHub adapter
         self.fichub_adapter = FicHub()
 
@@ -104,13 +103,15 @@ class QuoteFinderBot(commands.Bot):
         print(f"⚡ Gateway Latency: {round(self.latency * 1000)}ms")
         print("=" * 40)
 
+
 def main():
     if not TOKEN or TOKEN == "<your-bot-token>":
-        print("Error: DISCORD_CANARY_TOKEN or DISCORD_TOKEN is missing or not set properly in the .env file.")
+        print("Error: DISCORD_TOKEN is missing or not set properly in the .env file.")
         return
 
     bot = QuoteFinderBot()
     bot.run(TOKEN)
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Integer, DateTime, ForeignKey
+from sqlalchemy import String, Integer, BigInteger, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from database.models.base import Base
 
@@ -26,4 +26,4 @@ class Job(Base):
     completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
     target_url: Mapped[str] = mapped_column(String, nullable=True)
-    guild_id: Mapped[int] = mapped_column(Integer, nullable=True) 
+    guild_id: Mapped[int] = mapped_column(BigInteger, nullable=True)

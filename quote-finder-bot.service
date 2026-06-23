@@ -1,0 +1,32 @@
+[Unit]
+Description=Quote Finder Discord Bot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=arbaaz
+Group=arbaaz
+
+WorkingDirectory=/home/arbaaz/Projects/Quote-Finder
+EnvironmentFile=/home/arbaaz/Projects/Quote-Finder/.env
+
+ExecStart=/home/arbaaz/Projects/Quote-Finder/.venv/bin/python -m bot_main
+
+Restart=on-failure
+RestartSec=5
+
+TimeoutStopSec=30
+KillSignal=SIGTERM
+
+Environment=PYTHONUNBUFFERED=1
+Environment=HF_HOME=/home/arbaaz/.cache/huggingface
+Environment=OMP_NUM_THREADS=4
+Environment=OPENBLAS_NUM_THREADS=4
+Environment=MKL_NUM_THREADS=4
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

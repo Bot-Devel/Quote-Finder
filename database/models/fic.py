@@ -39,6 +39,7 @@ class Fic(Base):
 
     # Relationships
     versions: Mapped[List["FicVersion"]] = relationship("FicVersion", back_populates="fic", foreign_keys="[FicVersion.fic_id]")
+    guilds: Mapped[List["FicGuild"]] = relationship("FicGuild", back_populates="fic")
 
 
 class FicVersion(Base):
@@ -86,4 +87,4 @@ class FicGuild(Base):
     added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     
     # Relationship to Fic
-    fic: Mapped["Fic"] = relationship("Fic", backref="guilds")
+    fic: Mapped["Fic"] = relationship("Fic", back_populates="guilds")

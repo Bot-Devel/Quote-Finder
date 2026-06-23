@@ -121,16 +121,52 @@ class FicRepository:
                 await self.session.flush()
                 pending_objects = 0
             
-        # Update version stats
-        stmt = select(FicVersion).where(FicVersion.id == version_id)
+        await self.session.commit()
+        await self.update_version_stats(version_id)
+
+    async def get_chapter_hashes(self, version_id: str) -> dict[int, str]:
+        stmt = select(Chapter.chapter_number, Chapter.chapter_hash).where(Chapter.version_id == version_id)
         result = await self.session.execute(stmt)
-        version = result.scalar_one()
+        return {row.chapter_number: row.chapter_hash for row in result.all()}
+
+    async def delete_chapters(self, version_id: str, chapter_numbers: list[int]) -> None:
+        if not chapter_numbers:
+            return
+        stmt = select(Chapter).where(
+            Chapter.version_id == version_id,
+            Chapter.chapter_number.in_(chapter_numbers)
+        )
+        result = await self.session.execute(stmt)
+        chapters = result.scalars().all()
+        for ch in chapters:
+            await self.session.delete(ch)
+        await self.session.commit()
+
+    async def update_version_stats(self, version_id: str) -> None:
+        from sqlalchemy import func
+        chapter_count = await self.session.scalar(select(func.count(Chapter.id)).where(Chapter.version_id == version_id))
+        paragraph_count = await self.session.scalar(select(func.count(Paragraph.id)).where(Paragraph.version_id == version_id))
+        chunk_count = await self.session.scalar(select(func.count(Chunk.id)).where(Chunk.version_id == version_id))
+        word_count = await self.session.scalar(select(func.sum(Chapter.word_count)).where(Chapter.version_id == version_id)) or 0
         
+        stmt = select(FicVersion).where(FicVersion.id == version_id)
+        version = (await self.session.execute(stmt)).scalar_one()
         version.chapter_count = chapter_count
         version.paragraph_count = paragraph_count
         version.chunk_count = chunk_count
         version.word_count = word_count
-        
+        await self.session.commit()
+
+    async def touch_fic(self, fic_id: str) -> None:
+        stmt = select(Fic).where(Fic.id == fic_id)
+        fic = (await self.session.execute(stmt)).scalar_one()
+        if fic.active_version_id:
+            v_stmt = select(FicVersion).where(FicVersion.id == fic.active_version_id)
+            version = (await self.session.execute(v_stmt)).scalar_one()
+            fic.chapter_count = version.chapter_count
+        from sqlalchemy.sql import func
+        fic.last_refreshed_at = func.now()
+        fic.last_checked_at = func.now()
         await self.session.commit()
 
     async def activate_version(self, fic_id: str, version_id: str) -> None:
@@ -151,6 +187,8 @@ class FicRepository:
         
         from sqlalchemy.sql import func
         version.activated_at = func.now()
+        fic.last_refreshed_at = func.now()
+        fic.last_checked_at = func.now()
         
         await self.session.commit()
         logger.info(f"Activated version {version_id} for fic {fic_id}")
