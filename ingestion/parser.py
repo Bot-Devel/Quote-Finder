@@ -36,6 +36,10 @@ class ParagraphNormalizer:
         
         # Elements to treat as paragraphs
         for element in soup.find_all(['p', 'div', 'blockquote', 'h1', 'h2', 'h3', 'h4']):
+            # Skip if this element contains block children (prevents outer <div> wrappers from duplicating content)
+            if element.name == 'div' and element.find(['p', 'div', 'blockquote', 'h1', 'h2', 'h3', 'h4']):
+                continue
+                
             text = element.get_text(separator=' ', strip=True)
             if not text:
                 continue

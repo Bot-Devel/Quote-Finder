@@ -2,11 +2,24 @@ import re
 from search.models import SearchResult
 
 class SearchResultRenderer:
-    def format_page(self, search_type: str, result: SearchResult, current_index: int, returned_results: int, total_matches: int, results_truncated: bool, fic_title: str, query: str) -> str:
+    def format_page(self, search_type: str, result: SearchResult, current_index: int, returned_results: int, total_matches: int, results_truncated: bool, fic_title: str, query: str, fic_url: str = None, chapter_url: str = None) -> str:
         # 1. Metadata
-        metadata = f"**{self._escape_md(fic_title)}**\n**Chapter {result.chapter_number}**"
+        title_text = self._escape_md(fic_title)
+        if fic_url:
+            title_md = f"**[{title_text}]({fic_url})**"
+        else:
+            title_md = f"**{title_text}**"
+            
+        chapter_text = f"Chapter {result.chapter_number}"
         if result.chapter_title:
-            metadata += f" - {self._escape_md(result.chapter_title)}"
+            chapter_text += f" - {self._escape_md(result.chapter_title)}"
+            
+        if chapter_url:
+            chapter_md = f"**[{chapter_text}]({chapter_url})**"
+        else:
+            chapter_md = f"**{chapter_text}**"
+            
+        metadata = f"{title_md}\n{chapter_md}"
             
         # 2. Passage
         passage = ""

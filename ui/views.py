@@ -88,6 +88,9 @@ class SearchResultView(discord.ui.LayoutView):
         if not res:
             return "Loading context window..."
             
+        fic_url = self._get_chapter_url(self.fic_source_url, 1) or self.fic_source_url
+        chapter_url = self._get_chapter_url(self.fic_source_url, res.chapter_number) or self.fic_source_url
+
         return self.renderer.format_page(
             search_type=self.session.search_type,
             result=res,
@@ -96,7 +99,9 @@ class SearchResultView(discord.ui.LayoutView):
             total_matches=self.session.total_results,
             results_truncated=self.session.results_truncated,
             fic_title=self.fic_title,
-            query=self.query
+            query=self.query,
+            fic_url=fic_url,
+            chapter_url=chapter_url
         )
 
     def rebuild(self):
@@ -177,7 +182,14 @@ class SearchResultView(discord.ui.LayoutView):
 
     async def _on_close(self, interaction: discord.Interaction):
         await self.store.remove(self.session.session_id)
-        await interaction.response.edit_message(view=None)
+        
+        self.clear_items()
+        content = self._render_page(self.session.current_index)
+        container = discord.ui.Container()
+        container.add_item(discord.ui.TextDisplay(content))
+        self.add_item(container)
+        
+        await interaction.response.edit_message(view=self)
         self.stop()
         
     async def on_timeout(self):

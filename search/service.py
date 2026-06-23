@@ -40,6 +40,9 @@ class SearchService:
 
     async def search_exact_ids(self, fic_id: str, version_id: str, query: str, limit: int = 10000) -> tuple[list, int, bool]:
         start_time = time.time()
+        query_id = uuid.uuid4().hex
+        logger.info(f"[{query_id}] Starting EXACT search | fic={fic_id} | query='{query}'")
+        
         from ui.models import SearchResultRef
         normalized_query = self._normalize_query(query)
         line_ids, total = await self.repo.search_exact_ids(fic_id, version_id, normalized_query, limit + 1)
@@ -50,9 +53,16 @@ class SearchService:
             line_ids = line_ids[:limit]
             
         refs = [SearchResultRef(result_id=str(i), line_id=lid) for i, lid in enumerate(line_ids)]
+        
+        duration = time.time() - start_time
+        logger.info(f"[{query_id}] EXACT search completed in {duration:.3f}s | Found: {total} | Truncated: {truncated}")
         return refs, total, truncated
 
     async def search_fuzzy_ids(self, fic_id: str, version_id: str, query: str, limit: int = 100, min_score: float = 75.0) -> tuple[list, int, bool]:
+        start_time = time.time()
+        query_id = uuid.uuid4().hex
+        logger.info(f"[{query_id}] Starting FUZZY search | fic={fic_id} | query='{query}'")
+        
         from rapidfuzz import fuzz
         from ui.models import SearchResultRef
         normalized_query = self._normalize_query(query)
@@ -73,6 +83,9 @@ class SearchService:
             scored = scored[:limit]
             
         refs = [SearchResultRef(result_id=str(i), line_id=s["id"], fuzzy_score=s["score"]) for i, s in enumerate(scored)]
+        
+        duration = time.time() - start_time
+        logger.info(f"[{query_id}] FUZZY search completed in {duration:.3f}s | Found: {total} | Truncated: {truncated}")
         return refs, total, truncated
 
     async def fetch_results_context(self, fic_id: str, version_id: str, search_type: str, ref_map: dict) -> dict:
