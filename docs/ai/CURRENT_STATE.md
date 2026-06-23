@@ -27,3 +27,12 @@ The V1 architecture suffered from 15-20 second delays during exact and fuzzy sea
 ## UI / Discord Presentation
 * **Pagination**: Eagerly loaded. We strictly bound our search results to `limit=100`. Because bulk DB context fetching takes <20ms and Python string formatting takes <2ms, we eagerly format all 100 pages up front. This avoids the need for lazy loading and makes Discord pagination button clicks perfectly instant.
 * **ANSI Highlighting**: `PaginationView` renders results using `discord.Embed` alongside ANSI code blocks. The matched text paragraph is colored bright green (`\u001b[0;32m`), while the preceding and following context paragraphs are colored dark gray (`\u001b[0;30m`) to ensure the exact matched quote instantly pops out visually.
+
+## Semantic Search Pipeline Upgrades
+The semantic search architecture (`!qs`) has been entirely redesigned to improve recall and hard-negative discrimination:
+1. **Hybrid Retrieval**: Integrated Reciprocal Rank Fusion (RRF) to merge dense Qdrant vector retrieval with Postgres lexical retrieval (`ts_rank_cd` full-text search) before reranking.
+2. **Post-Retrieval Chunk Merging**: Candidate paragraphs are now logically grouped and merged into contiguous chapter-level segments to avoid redundancy and spamming the user with overlapping hits from the same scene.
+3. **Provenance Tracking**: Candidates track their sourcing (e.g., `original_dense`, `expansion_lexical`) via a `matched_by` payload field, allowing easy auditing of retrieval contributions without exposing it in the UI.
+4. **FastEmbed Migration**: Replaced heavy `SentenceTransformers` with `fastembed` for both base embeddings (`LocalFastEmbedProvider` using BAAI/bge-small-en-v1.5) and cross-encoder reranking (`LocalFastEmbedReranker` using Jina/BGE models). Offloaded these to an `AsyncEmbeddingProvider` thread-executor to prevent blocking the async event loop.
+5. **Evaluation Framework**: Created `eval_pipeline.py` and `run_evals.sh` to execute offline ablation experiments across varying retrieve limits (K=30 vs K=50), hybrid variants, query expansion toggles, and different cross-encoders. Metrics track MRR, nDCG@10, Recall@10, Latency, and Memory Footprint.
+6. **Query Expansion Plumbing**: Support for injecting multiple query variants into the RRF retrieval layer has been integrated (currently using explicit mock matching to validate the architectural plumbing).

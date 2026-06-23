@@ -18,6 +18,16 @@ class QdrantStore(VectorStore):
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=dimensions, distance=Distance.COSINE),
             )
+            await self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="fic_id",
+                field_schema=models.PayloadSchemaType.KEYWORD,
+            )
+            await self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="version_id",
+                field_schema=models.PayloadSchemaType.KEYWORD,
+            )
 
     async def upsert_chunks(self, fic_id: str, version_id: str, chunks: list[ParsedChunk], embeddings: list[list[float]]) -> None:
         if len(chunks) != len(embeddings):
@@ -73,10 +83,10 @@ class QdrantStore(VectorStore):
             )
         )
 
-    async def search(self, vector: list[float], fic_id: str, version_id: str, limit: int) -> list[dict]:
-        results = await self.client.search(
+    async def search(self, vector: list[float], fic_id: str, version_id: str, limit: int, score_threshold: float = 0.5) -> list[dict]:
+        results = await self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=vector,
+            query=vector,
             query_filter=models.Filter(
                 must=[
                     models.FieldCondition(
@@ -90,6 +100,7 @@ class QdrantStore(VectorStore):
                 ]
             ),
             limit=limit,
-            with_payload=True
+            with_payload=True,
+            score_threshold=score_threshold
         )
-        return [{"id": hit.id, "score": hit.score, "payload": hit.payload} for hit in results]
+        return [{"id": hit.id, "score": hit.score, "payload": hit.payload} for hit in results.points]

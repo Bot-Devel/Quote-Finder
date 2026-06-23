@@ -41,3 +41,6 @@ class SearchResults:
     results_truncated: bool
 
     results: list[SearchResult]
+    
+    # For evaluation
+    evaluation_candidates: Optional[list] = None

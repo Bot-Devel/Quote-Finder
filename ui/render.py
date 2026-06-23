@@ -8,15 +8,13 @@ class SearchResultRenderer:
         if result.chapter_title:
             metadata += f" - {self._escape_md(result.chapter_title)}"
             
-        if results_truncated:
-            metadata += f"\n*(Showing top {returned_results} of {total_matches} matches)*"
-
         # 2. Passage
         passage = ""
         if search_type == "semantic":
+            highlighted_match = self._highlight_matches(result.matched_text, query, "fuzzy")
             if result.context_before:
                 passage += f"{result.context_before}\n\n"
-            passage += f"{result.matched_text}\n\n"
+            passage += f"{highlighted_match}\n\n"
             if result.context_after:
                 passage += f"{result.context_after}"
         else:

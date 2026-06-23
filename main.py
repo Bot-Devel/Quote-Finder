@@ -11,6 +11,7 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from ingestion.embedding import LocalFastEmbedProvider, AsyncEmbeddingProvider
+from search.reranker import LocalFastEmbedReranker, AsyncRerankerProvider
 from ingestion.vector import QdrantStore
 from adapters.fichub import FicHub
 
@@ -48,8 +49,9 @@ class QuoteFinderBot(commands.Bot):
         self.session_maker = None
         self.vector_store = None
         self.embedding_provider = None
+        self.reranker_provider = None
         self.fichub_adapter = None
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.executor = ThreadPoolExecutor(max_workers=2)
 
     async def setup_hook(self):
         print("Initializing services...")
@@ -65,6 +67,18 @@ class QuoteFinderBot(commands.Bot):
         # Embedding setup (loads model, might take a moment)
         sync_provider = LocalFastEmbedProvider()
         self.embedding_provider = AsyncEmbeddingProvider(sync_provider, self.executor)
+        
+        # Reranker setup
+        import config
+        if config.SEMANTIC_RERANK_ENABLED:
+            print("Loading cross-encoder reranker model...")
+            sync_reranker = LocalFastEmbedReranker()
+            self.reranker_provider = AsyncRerankerProvider(sync_reranker, self.executor)
+            
+        print("Warming up models...")
+        await self.embedding_provider.embed_query("warmup")
+        if self.reranker_provider:
+            await self.reranker_provider.rerank("warmup", ["warmup"])
         
         # FicHub adapter
         self.fichub_adapter = FicHub()

@@ -25,3 +25,18 @@ CHUNK_OVERLAP_WORDS = int(os.getenv("CHUNK_OVERLAP_WORDS", "75"))
 EMBEDDING_BATCH_SIZE = int(os.getenv("EMBEDDING_BATCH_SIZE", "32"))
 QDRANT_BATCH_SIZE = int(os.getenv("QDRANT_BATCH_SIZE", "128"))
 DATABASE_BATCH_SIZE = int(os.getenv("DATABASE_BATCH_SIZE", "500"))
+
+# --- Semantic Search & Reranking Settings ---
+# --- Semantic Search & Reranking Settings ---
+SEMANTIC_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+SEMANTIC_RERANK_ENABLED = os.getenv("SEMANTIC_RERANK_ENABLED", "false").lower() == "true"
+SEMANTIC_RERANK_MODEL = os.getenv("SEMANTIC_RERANK_MODEL", "jinaai/jina-reranker-v1-tiny-en")
+SEMANTIC_RETRIEVAL_K = int(os.getenv("SEMANTIC_RETRIEVAL_K", "30"))
+SEMANTIC_RESULT_LIMIT = int(os.getenv("SEMANTIC_RESULT_LIMIT", "10"))
+
+# Hybrid Search Config
+SEMANTIC_HYBRID_ENABLED = os.getenv("SEMANTIC_HYBRID_ENABLED", "false").lower() == "true"
+SEMANTIC_LEXICAL_K = int(os.getenv("SEMANTIC_LEXICAL_K", "30"))
+
+# Query Expansion Config
+SEMANTIC_EXPANSION_ENABLED = os.getenv("SEMANTIC_EXPANSION_ENABLED", "false").lower() == "true"
