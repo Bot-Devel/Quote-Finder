@@ -1,74 +1,68 @@
-<h1 align="center">Quote Finder</h1>
+# Quote Finder
 
-[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/) <br/>
-This is a discord bot written in Python which searches a text file using RegEx to find a quote and output the line containing the quote as well as the next line in an embed message.<br/>
-The bot currenly supports searching feature for the following fanfiction-
-<br/>
+Quote Finder is a high-performance Discord bot that provides instant exact, fuzzy, and semantic search for fanfictions ingested from FanFiction.net/FicHub.
 
-- **Harry Potter and the Prince of Slytherin by The Sinister Man**
-- **Black Luminary by YakAge**
-- **Harry Potter and the Ashes of Chaos By ACI100**
+## Architecture
 
-<br/>
+The project runs natively using a two-process architecture powered by `systemd`:
+1. **`quote-finder-bot.service` (Continuous):** The main Discord bot process. It handles public search queries, pagination, and manual `!qf ingest` / `!qf refresh` commands. Heavy workloads initiated manually are securely offloaded to background threads.
+2. **`quote-finder-maintenance.timer` (Nightly):** A `systemd` timer running `quote-finder-maintenance.service` every night at 03:00. This one-shot process scans for any fics due for updates, downloads the latest version if changed, generates embeddings (lazily loaded), and cleanly exits to release memory.
 
-The bot's command prefix is `q` <br/>
+Both processes communicate and prevent concurrent operations using atomic Postgres job locks (`SELECT ... FOR UPDATE SKIP LOCKED`).
 
-# Bot Usage
+## Ingestion Pipeline
 
-The bot has the following commands:
+The bot safely imports and processes massive fanfictions using a sophisticated background pipeline:
+1. **Source & Validation**: Fetches the latest EPUB format from FicHub. The EPUB is strictly validated and parsed to extract chapter titles and raw paragraph text, while explicitly ignoring structural HTML wrapper bloat.
+2. **Chunking**: Paragraphs are assembled into contiguous, overlapping text chunks (e.g., 200 words, 50-word overlap). This ensures semantic meaning and narrative context aren't lost at paragraph boundaries.
+3. **Vectorization**: Uses local embedding models (e.g., `BAAI/bge-small-en-v1.5`) running asynchronously on the host machine to generate dense vector representations of each chunk.
+4. **Storage Integration**:
+   - **Neon Postgres**: Stores raw textual data, chapters, and normalized paragraph text.
+   - **Qdrant Cloud**: Stores the dense chunk vectors for semantic similarity search.
+5. **Differential Updates**: When tracking ongoing fics, the nightly maintenance job calculates chapter-level hashes. It performs a "Delta Refresh" by identifying and re-vectorizing *only* the chapters that were modified or added, saving massive amounts of compute.
 
-- qf: To search a quote
-- qfk: To search a quote using keywords
-- qhelp: To show the help command
+## Retrieval Pipeline
 
-<br/>The following is an example on how the bot works in realtime-
+When a user searches for a quote, the bot seamlessly routes queries through specialized retrieval flows:
+1. **Exact Search (`!qfe`)**: Executes a fast SQL `LIKE` query against normalized text in Postgres to find exact, verbatim matches.
+2. **Fuzzy Search (`!qff`)**: Uses Postgres Trigram indices (`pg_trgm`) to rapidly filter a candidate pool, then applies Python's `rapidfuzz` to rank candidates based on partial ratio string similarity.
+3. **Semantic Search (`!qfs`)**: Encodes the user's query into a vector and performs a fast k-NN search via Qdrant to find chunks with high Cosine Similarity, ideal for finding scenes based on vague descriptions.
+4. **Context Assembly**: Once matching paragraphs or chunks are identified, the system automatically fetches adjacent paragraphs from Postgres to present seamless, flowing context in the UI.
+5. **Presentation**: Results are rendered using interactive pagination Views, complete with hit highlighting and direct markdown hyperlinks to the exact FanFiction.net chapter.
 
-![](https://raw.githubusercontent.com/arzkar/Quote-Finder-Bot/main/images/bot_output.gif)
+## Commands
 
-# Development
 
-## Python
+**Public Search:**
+- `!qfe <query>`: Exact substring matching
+- `!qff <query>`: Fuzzy lexical searching
+- `!qfs <query>`: Semantic scene search (uses local embedding models)
 
-- Install Python >=3.8.5
-- Create a python virtual environment in which you will be installing all the dependencies and activate it before installing the dependencies.
-- Install the dependencies using `pip install -r requirements_dev.txt`
+**Maintenance (Root Only):**
+- `!qf ingest <ffn_id_or_url>`: Queues a fic for ingestion and processes it safely in the background.
+- `!qf refresh <fic_id_or_alias>`: Forces a manual refresh check for a specific fic.
+- `!qf connect <source_story_id> <guild_id>`: Connects an already ingested fic to a specific Discord server so it can be searched there.
+- `!qf status`: Displays a dashboard of all tracked fics, their latest chapter counts, last fetch times, and connected Discord servers.
 
-## Git
+## Deployment
 
-- Create a new directory called `Quote Finder` in you system. You will be forking and cloning the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) & [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository.
+To deploy Quote Finder to a production Linux server, follow these steps to link and enable the `systemd` units:
 
-- [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) contains the source code for the bot.
+```bash
+# 1. Link the service files to systemd
+sudo ln -s /path/to/Quote-Finder/quote-finder-bot.service /etc/systemd/system/
+sudo ln -s /path/to/Quote-Finder/quote-finder-maintenance.service /etc/systemd/system/
+sudo ln -s /path/to/Quote-Finder/quote-finder-maintenance.timer /etc/systemd/system/
 
-- [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) contains the data files and is added as a submodule to the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) repositories.
+# 2. Reload the daemon to register the units
+sudo systemctl daemon-reload
 
-### Forking & Cloning the Quote-Finder Repository
+# 3. Start and enable the continuously running bot
+sudo systemctl enable --now quote-finder-bot.service
 
-- Fork the [Quote-Finder](https://github.com/Bot-Devel/Quote-Finder) repository and clone the fork in the `Quote Finder` directory using `git clone --recurse-submodules <URL>` since the repository contains a submodule.
+# 4. Start and enable the nightly timer
+# DO NOT enable the maintenance.service directly
+sudo systemctl enable --now quote-finder-maintenance.timer
+```
 
-- Create a new branch for your development. Do not add new features to the `main` branch.
-
-### Forking & Cloning the Quote-Finder-Data Repository
-
-- Since all the data files are stored in a separate Github repository called [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data), you will need fork & clone it in the `Quote Finder` directory to add or updates data files.
-
-- Add or update any files you need to and then push to your fork. Then make a PR to the [Upstream](https://github.com/Bot-Devel/Quote-Finder-Data)
-
-### Updating the "data" submodule
-
-- You will need to pull the submodule once your changes are merged in the [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository.
-
-- In your `Quote-Finder` directory, you can simply `cd data/` and `git pull`, as you normally do for repositories since the submodule is also a git repository.
-
-- Alternatively, you can also use `git submodule foreach git pull origin main` to pull the changes. This is the recommended way.
-
-Note: This pulls from the Upstream [Quote-Finder-Data](https://github.com/Bot-Devel/Quote-Finder-Data) repository as configured in the `.gitmodules` file. During development, you can change the `url` of the submodule to your fork or you can directly copy the files to your local `/data` directory (recommended).
-
-## Discord
-
-- Create a `.env` file which should contain the `DISCORD_TOKEN` for your testing bot as shown in the `.env.ex` file.
-
-- Create a testing bot from the [Discord Developer Portal](https://discord.com/developers/applications) and copy the bot token to the `.env` file.
-
-- Run the bot using `python main.py` in the root directory.
-
-- To add support for other fanfictions, check the `scripts/` directory to know how to add the necessary data files.
+*Note: Update the `/path/to/Quote-Finder` paths inside the `.service` files and the symlink commands to point to your actual repository clone path before running.*
