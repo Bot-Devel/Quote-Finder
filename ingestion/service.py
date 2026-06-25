@@ -154,9 +154,12 @@ class IngestionService:
         if not hasattr(self.fichub, "response") or "meta" not in self.fichub.response:
             raise ValueError("Failed to fetch metadata")
             
+        if getattr(self.fichub, "exit_status", 0) == 1 or "hashes" not in self.fichub.response:
+            raise ValueError(f"FicHub returned no hashes for {source_url} — URL may be unsupported or not yet cached")
+
         meta = self.fichub.response["meta"]
         source_story_id = str(meta["rawExtendedMeta"]["id"])
-        new_epub_hash = meta["hashes"]["epub"]
+        new_epub_hash = self.fichub.response["hashes"]["epub"]
         
         fic = await self.repo.get_or_create_fic(source_story_id, meta["title"], meta["author"], source_url)
         await self.repo.associate_guild(fic.id, guild_id)
