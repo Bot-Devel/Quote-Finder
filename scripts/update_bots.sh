@@ -1,3 +1,4 @@
+```bash
 #!/usr/bin/env bash
 
 set -Eeuo pipefail
@@ -10,11 +11,45 @@ log() {
     printf '\n[%s] %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"
 }
 
-deploy_project() {
+install_unit() {
     local project_directory="$1"
-    shift
+    local unit="$2"
+    local unit_file="$project_directory/$unit"
 
-    local systemd_units=("$@")
+    if [[ ! -f "$unit_file" ]]; then
+        echo "Error: Unit file not found: $unit_file" >&2
+        return 1
+    fi
+
+    log "Symlinking $unit"
+
+    sudo ln -sfn \
+        "$unit_file" \
+        "/etc/systemd/system/$unit"
+}
+
+check_unit() {
+    local unit="$1"
+
+    sleep 2
+
+    if sudo systemctl is-failed --quiet "$unit"; then
+        echo "Error: $unit failed." >&2
+        sudo systemctl status "$unit" --no-pager || true
+        sudo journalctl -u "$unit" -n 50 --no-pager || true
+        return 1
+    fi
+
+    if ! sudo systemctl is-active --quiet "$unit"; then
+        echo "Error: $unit is not active." >&2
+        sudo systemctl status "$unit" --no-pager || true
+        sudo journalctl -u "$unit" -n 50 --no-pager || true
+        return 1
+    fi
+}
+
+sync_project() {
+    local project_directory="$1"
 
     if [[ ! -d "$project_directory/.git" ]]; then
         echo "Error: $project_directory is not a Git repository." >&2
@@ -32,78 +67,85 @@ deploy_project() {
     git clean -fd
 
     if [[ -f "requirements.txt" ]]; then
-        log "Updating Python dependencies"
-
-        if [[ -x ".venv/bin/python" ]]; then
-            .venv/bin/python -m pip install \
-                --disable-pip-version-check \
-                -r requirements.txt
-        elif [[ -x "/home/arbaaz/.pyenv/versions/fanfic-finder-bot/bin/python" \
-            && "$project_directory" == "$FF_DIR" ]]; then
-            /home/arbaaz/.pyenv/versions/fanfic-finder-bot/bin/python \
-                -m pip install \
-                --disable-pip-version-check \
-                -r requirements.txt
-        else
-            echo "Error: No Python environment found for $project_directory." >&2
+        if [[ ! -x ".venv/bin/python" ]]; then
+            echo "Error: Missing virtual environment: $project_directory/.venv" >&2
             return 1
         fi
+
+        log "Updating Python dependencies"
+
+        .venv/bin/python -m pip install \
+            --disable-pip-version-check \
+            -r requirements.txt
     fi
 
     if [[ -f "alembic.ini" ]]; then
-        if [[ -x ".venv/bin/alembic" ]]; then
-            log "Running database migrations"
-            .venv/bin/alembic upgrade head
-        else
+        if [[ ! -x ".venv/bin/alembic" ]]; then
             echo "Error: alembic.ini exists but .venv/bin/alembic was not found." >&2
             return 1
         fi
+
+        log "Running database migrations"
+        .venv/bin/alembic upgrade head
     fi
+}
 
-    for unit in "${systemd_units[@]}"; do
-        local unit_file="$project_directory/$unit"
+deploy_fanfiction_finder() {
+    sync_project "$FF_DIR"
 
-        if [[ ! -f "$unit_file" ]]; then
-            echo "Error: Unit file not found: $unit_file" >&2
-            return 1
-        fi
-
-        log "Symlinking $unit"
-
-        sudo ln -sf "$unit_file" "/etc/systemd/system/$unit"
-    done
+    install_unit \
+        "$FF_DIR" \
+        "Fanfiction-Finder.service"
 
     sudo systemctl daemon-reload
 
-    for unit in "${systemd_units[@]}"; do
-        if ! sudo systemctl is-enabled --quiet "$unit" 2>/dev/null; then
-            log "Enabling $unit (if applicable)"
-            sudo systemctl enable "$unit" 2>/dev/null || true
-        fi
+    log "Enabling and restarting Fanfiction-Finder.service"
 
-        log "Restarting $unit"
+    sudo systemctl enable Fanfiction-Finder.service
+    sudo systemctl restart Fanfiction-Finder.service
 
-        sudo systemctl restart "$unit"
+    check_unit "Fanfiction-Finder.service"
 
-        sleep 2
+    log "Fanfiction-Finder.service successfully deployed"
+}
 
-        if sudo systemctl is-failed --quiet "$unit"; then
-            echo "Error: $unit failed to start." >&2
-            sudo systemctl status "$unit" --no-pager || true
-            sudo journalctl -u "$unit" -n 50 --no-pager || true
-            return 1
-        fi
-        
-        # For non-oneshot services like the bot, ensure they are actively running
-        if [[ "$unit" != *"maintenance.service" ]] && ! sudo systemctl is-active --quiet "$unit"; then
-            echo "Error: $unit is not active." >&2
-            sudo systemctl status "$unit" --no-pager || true
-            sudo journalctl -u "$unit" -n 50 --no-pager || true
-            return 1
-        fi
+deploy_quote_finder() {
+    sync_project "$QF_DIR"
 
-        log "$unit successfully processed"
-    done
+    install_unit \
+        "$QF_DIR" \
+        "quote-finder-bot.service"
+
+    install_unit \
+        "$QF_DIR" \
+        "quote-finder-maintenance.service"
+
+    install_unit \
+        "$QF_DIR" \
+        "quote-finder-maintenance.timer"
+
+    sudo systemctl daemon-reload
+
+    log "Enabling and restarting quote-finder-bot.service"
+
+    sudo systemctl enable quote-finder-bot.service
+    sudo systemctl restart quote-finder-bot.service
+
+    check_unit "quote-finder-bot.service"
+
+    log "Enabling and restarting quote-finder-maintenance.timer"
+
+    sudo systemctl enable quote-finder-maintenance.timer
+    sudo systemctl restart quote-finder-maintenance.timer
+
+    check_unit "quote-finder-maintenance.timer"
+
+    # Deliberately do not enable or start:
+    # quote-finder-maintenance.service
+    #
+    # The timer starts this one-shot service according to its schedule.
+
+    log "Quote Finder successfully deployed"
 }
 
 usage() {
@@ -118,29 +160,16 @@ main() {
 
     case "$1" in
         all)
-            deploy_project \
-                "$FF_DIR" \
-                "Fanfiction-Finder.service"
-
-            deploy_project \
-                "$QF_DIR" \
-                "quote-finder-bot.service" \
-                "quote-finder-maintenance.service" \
-                "quote-finder-maintenance.timer"
+            deploy_fanfiction_finder
+            deploy_quote_finder
             ;;
 
         qf)
-            deploy_project \
-                "$QF_DIR" \
-                "quote-finder-bot.service" \
-                "quote-finder-maintenance.service" \
-                "quote-finder-maintenance.timer"
+            deploy_quote_finder
             ;;
 
         ff)
-            deploy_project \
-                "$FF_DIR" \
-                "Fanfiction-Finder.service"
+            deploy_fanfiction_finder
             ;;
 
         *)
@@ -152,3 +181,4 @@ main() {
 }
 
 main "$@"
+```
