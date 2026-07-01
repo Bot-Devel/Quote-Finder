@@ -25,12 +25,11 @@ class SearchService:
         self.reranker = reranker
 
     def _normalize_query(self, query: str) -> str:
-        # Same logic as parsing, lowercased
-        text = query.lower()
-        # simplified normalizer for quotes
-        text = re.sub(r'[""‘’]', "'", text)
-        text = re.sub(r'["“”]', '"', text)
-        text = re.sub(r'\s+', ' ', text).strip()
+        import unicodedata
+        text = unicodedata.normalize(“NFKC”, query)
+        text = text.casefold()
+        text = re.sub(r”[^a-z0-9\s]”, “”, text)
+        text = re.sub(r’\s+’, ‘ ‘, text).strip()
         return text
 
     async def _fetch_context(self, chapter_id: str, start_para: int, end_para: int, prev_lines: int, next_lines: int):

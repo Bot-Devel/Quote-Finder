@@ -1,4 +1,5 @@
 import hashlib
+import re
 import unicodedata
 from pathlib import Path
 from bs4 import BeautifulSoup
@@ -19,6 +20,8 @@ class ParagraphNormalizer:
         text = text.replace("‘", "'").replace("’", "'").replace("“", '"').replace("”", '"')
         # Dash normalization
         text = text.replace("—", "-").replace("–", "-")
+        # Strip all punctuation — keep only alphanumeric and spaces
+        text = re.sub(r"[^a-z0-9\s]", "", text)
         # Whitespace collapsing
         text = " ".join(text.split())
         return text
@@ -185,7 +188,7 @@ class EpubParser:
         
     def _is_story_document(self, item: epub.EpubItem) -> bool:
         name = item.get_name().lower()
-        non_story_keywords = ["title", "cover", "nav", "toc", "copyright"]
+        non_story_keywords = ["title", "cover", "nav", "toc", "copyright", "info"]
         for kw in non_story_keywords:
             if kw in name:
                 return False
