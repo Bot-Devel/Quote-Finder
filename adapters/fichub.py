@@ -41,7 +41,7 @@ class FicHub:
             except (
                 requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
-            ) as e:
+            ):
                 logger.error(str(traceback.format_exc()))
 
         try:
@@ -114,6 +114,6 @@ class FicHub:
             except (
                 requests.exceptions.ConnectionError,
                 requests.exceptions.Timeout,
-            ) as e:
+            ):
                 logger.error(str(traceback.format_exc()))
                 time.sleep(3)

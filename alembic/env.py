@@ -24,6 +24,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from database.models import Base
+
 target_metadata = Base.metadata
 
 # Set the sqlalchemy.url dynamically using environment variables

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 SearchResultType = Literal["exact", "fuzzy", "semantic"]
 
+
 @dataclass
 class SearchResult:
     fic_id: str
@@ -13,7 +14,7 @@ class SearchResult:
     chapter_title: Optional[str]
 
     start_position: int  # paragraph_number or start_paragraph
-    end_position: int    # paragraph_number or end_paragraph
+    end_position: int  # paragraph_number or end_paragraph
 
     matched_text: str
     context_before: Optional[str]
@@ -26,6 +27,7 @@ class SearchResult:
 
     source_line_id: Optional[str] = None
     source_chunk_id: Optional[str] = None
+
 
 @dataclass
 class SearchResults:
@@ -41,6 +43,6 @@ class SearchResults:
     results_truncated: bool
 
     results: list[SearchResult]
-    
+
     # For evaluation
     evaluation_candidates: Optional[list] = None

@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class ParsedParagraph:
     number: int
     text: str
     normalized_text: str
     word_count: int
+
 
 @dataclass
 class ParsedChapter:
@@ -15,6 +17,7 @@ class ParsedChapter:
     chapter_hash: str
     paragraphs: list[ParsedParagraph]
     word_count: int
+
 
 @dataclass
 class ParsedChunk:
@@ -26,6 +29,7 @@ class ParsedChunk:
     normalized_text: str
     text_hash: str
     word_count: int
+
 
 @dataclass
 class ParsedFic:

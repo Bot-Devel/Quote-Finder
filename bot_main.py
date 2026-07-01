@@ -55,7 +55,9 @@ class QuoteFinderBot(commands.Bot):
         print("Initializing services...")
         # Database setup
         if DATABASE_URL:
-            self.engine = create_async_engine(DATABASE_URL, echo=False, pool_pre_ping=True, pool_recycle=1800)
+            self.engine = create_async_engine(
+                DATABASE_URL, echo=False, pool_pre_ping=True, pool_recycle=1800
+            )
             self.session_maker = async_sessionmaker(self.engine, expire_on_commit=False)
 
         # Qdrant setup

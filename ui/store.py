@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from ui.models import SearchSession
 
+
 class SearchSessionStore:
     def __init__(self):
         self._sessions: dict[str, SearchSession] = {}
